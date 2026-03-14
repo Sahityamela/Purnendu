@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Books - SAHITYA MELA</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root { --main: #8B0000; --bg: #f4f7f6; }
+        body { font-family: 'Segoe UI', sans-serif; margin: 0; background: var(--bg); overflow-x: hidden; }
+
+        /* --- HEADER & MENU PANEL (Exactly like your image) --- */
+        .admin-header { background: white; padding: 10px 20px; display: flex; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.1); position: sticky; top: 0; z-index: 1000; }
+        .mobile-menu-toggle { cursor: pointer; background: none; border: none; font-size: 1.5rem; color: var(--main); margin-right: 15px; }
+        .logo { display: flex; align-items: center; gap: 10px; }
+        .logo img { height: 40px; }
+        
+        /* Sidebar Panel */
+        .admin-sidebar { position: fixed; left: -285px; top: 0; bottom: 0; width: 280px; background: white; z-index: 9999; transition: 0.3s; box-shadow: 2px 0 10px rgba(0,0,0,0.1); }
+        .admin-sidebar.active { left: 0; }
+        .admin-menu ul { list-style: none; padding: 20px 0; margin: 0; }
+        .admin-menu li a { display: flex; align-items: center; gap: 12px; padding: 15px 25px; text-decoration: none; color: #444; font-weight: 500; border-bottom: 1px solid #eee; }
+        .admin-menu li a:hover, .admin-menu li a.active { background: #fff5f5; color: var(--main); border-right: 4px solid var(--main); }
+        
+        /* Backdrop */
+        .mobile-backdrop { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 9998; display: none; }
+        .mobile-backdrop.active { display: block; }
+
+        /* --- CONTENT STYLING --- */
+        .main-content { padding: 25px; max-width: 1200px; margin: auto; }
+        .page-title { color: var(--main); font-size: 2rem; margin-bottom: 20px; }
+        .search-box { width: 100%; max-width: 500px; margin-bottom: 25px; }
+        .search-box input { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #ddd; outline: none; }
+        
+        /* --- UPDATED CARD STYLING --- */
+        .books-grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fill, minmax(380px, 1fr)); 
+            gap: 20px; 
+        }
+
+        .book-card { 
+            background: white; 
+            border-radius: 12px; 
+            padding: 20px; 
+            display: flex; 
+            gap: 20px; 
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08); 
+            align-items: flex-start; 
+            border: 1px solid #eee; 
+            transition: transform 0.2s;
+        }
+
+        .book-card:hover { transform: translateY(-3px); }
+        
+        .book-cover { 
+            width: 100px; 
+            height: 140px; 
+            background: #f9f9f9; 
+            border-radius: 8px; 
+            overflow: hidden; 
+            flex-shrink: 0; 
+            border: 1px solid #ddd; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+        }
+        .book-cover img { width: 100%; height: 100%; object-fit: cover; }
+
+        .book-info { flex: 1; display: flex; flex-direction: column; gap: 5px; }
+        .book-title { font-size: 1.2rem; font-weight: bold; color: var(--main); line-height: 1.2; }
+        .book-author { font-size: 0.95rem; color: #444; font-weight: 500; }
+        .book-meta { font-size: 0.85rem; color: #777; margin: 5px 0; line-height: 1.5; }
+        
+        .btn-group { display: flex; gap: 10px; margin-top: auto; padding-top: 10px; flex-wrap: wrap; }
+        .btn { 
+            padding: 10px 16px; 
+            border-radius: 6px; 
+            color: white; 
+            text-decoration: none; 
+            font-size: 0.85rem; 
+            font-weight: 600;
+            display: flex; 
+            align-items: center; 
+            gap: 6px; 
+            border: none; 
+            cursor: pointer; 
+            flex: 1;
+            justify-content: center;
+        }
+        .btn-view { background: #007bff; }
+        .btn-edit { background: #495057; }
+        .btn-delete { background: #dc3545; flex: 0; } /* Keep delete button small */
+
+        /* --- PROFESSIONAL MOBILE ADJUSTMENTS --- */
+        @media (max-width: 600px) {
+            .main-content { padding: 15px; }
+            .books-grid { grid-template-columns: 1fr; gap: 15px; }
+            
+            .book-card { 
+                flex-direction: column; /* Stack image and text */
+                align-items: center; 
+                text-align: center; 
+                padding: 15px;
+            }
+
+            .book-cover { 
+                width: 120px; /* Make image bigger on mobile */
+                height: 170px; 
+                margin-bottom: 5px;
+            }
+
+            .book-info { width: 100%; }
+
+            .btn-group { 
+                width: 100%; 
+                justify-content: center;
+            }
+
+            .btn { width: 100%; flex: 1; }
+        }
+    </style>
+</head>
+<body>
+
+<header class="admin-header">
+    <button class="mobile-menu-toggle" onclick="toggleMenu()"><i class="fas fa-bars"></i></button>
+    <div class="logo">
+        <img src="../assets/images/logo.png" alt="Logo">
+        <span style="font-weight:bold; color:var(--main);">Admin Panel</span>
+    </div>
+</header>
+
+<aside class="admin-sidebar" id="adminSidebar">
+    <nav class="admin-menu">
+        <ul>
+            <li><a href="dashboard.html"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+            <li><a href="manage-books.html" class="active"><i class="fas fa-book"></i> Manage Books</a></li>
+            <li><a href="add-book.html"><i class="fas fa-plus-circle"></i> Add New Book</a></li>
+            <li><a href="messages.html"><i class="fas fa-envelope"></i> Messages</a></li>
+            <li><a href="../index.html" target="_blank"><i class="fas fa-external-link-alt"></i> View Site</a></li>
+        </ul>
+    </nav>
+</aside>
+<div class="mobile-backdrop" id="mobileBackdrop" onclick="toggleMenu()"></div>
+
+<main class="main-content">
+    <h1 class="page-title">Manage Books</h1>
+    <div class="search-box">
+        <input type="text" id="searchBar" placeholder="Search title or author..." onkeyup="filterBooks()">
+    </div>
+    <div id="stats" style="margin-bottom: 15px; font-weight: bold;">Loading...</div>
+    <div id="booksGrid" class="books-grid"></div>
+</main>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getDatabase, ref, onValue, remove } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyCftWFc6WvMbaY_iwF6DUawi7Qvf0SRKYc",
+        authDomain: "sahitya-mela.firebaseapp.com",
+        databaseURL: "https://sahitya-mela-default-rtdb.firebaseio.com",
+        projectId: "sahitya-mela",
+        storageBucket: "sahitya-mela.firebasestorage.app",
+        messagingSenderId: "283544938564",
+        appId: "1:283544938564:web:b9bba32cca9e52e6aab411"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+
+    // --- FIXED IMAGE LOGIC ---
+    function fixUrl(url) {
+        if (!url || url.includes('logo.png')) return "../assets/images/logo.png";
+        
+        let id = "";
+        // Extract ID from any Google Drive link format
+        if (url.includes('id=')) {
+            id = url.split('id=')[1].split('&')[0];
+        } else if (url.includes('/d/')) {
+            id = url.split('/d/')[1].split('/')[0];
+        }
+        
+        // Return the dynamic ID. DO NOT hardcode an ID here.
+        return id ? `https://lh3.googleusercontent.com/d/${id}` : url;
+    }
+
+    onValue(ref(db, 'books'), (snapshot) => {
+        const grid = document.getElementById('booksGrid');
+        grid.innerHTML = '';
+        
+        if (snapshot.exists()) {
+            let count = 0;
+            snapshot.forEach((child) => {
+                const b = child.val();
+                const id = child.key;
+                
+                // IMPORTANT: Use b.coverUrl from the database
+                const coverImg = fixUrl(b.coverUrl);
+                const galleryCount = b.gallery ? (Array.isArray(b.gallery) ? b.gallery.length : Object.keys(b.gallery).length) : 0;
+
+                grid.innerHTML += `
+                    <div class="book-card">
+                        <div class="book-cover">
+                            <img src="${coverImg}" onerror="this.src='../assets/images/logo.png'">
+                        </div>
+                        <div class="book-info">
+                            <div class="book-title">${b.title || 'Untitled'}</div>
+                            <div class="book-author">By ${b.author || 'Unknown'}</div>
+                            <div class="book-meta">
+                                <b>ISBN:</b> ${b.isbn || '-'}<br>
+                                <i class="fas fa-images"></i> ${galleryCount} Photos
+                            </div>
+                            <div class="btn-group">
+                                <a href="../book-reader.html?id=${id}" class="btn btn-view"><i class="fas fa-eye"></i> View</a>
+                                <a href="edit-book.html?id=${id}" class="btn btn-edit"><i class="fas fa-edit"></i> Edit</a>
+                                <button onclick="deleteBook('${id}')" class="btn btn-delete"><i class="fas fa-trash"></i></button>
+                            </div>
+                        </div>
+                    </div>`;
+                count++;
+            });
+            document.getElementById('stats').innerText = count + " Books Found";
+        }
+    });
+
+    window.toggleMenu = function() {
+        document.getElementById('adminSidebar').classList.toggle('active');
+        document.getElementById('mobileBackdrop').classList.toggle('active');
+    };
+
+    window.deleteBook = (id) => {
+        if (confirm("Delete this book?")) remove(ref(db, 'books/' + id));
+    };
+
+    window.filterBooks = () => {
+        const val = document.getElementById('searchBar').value.toUpperCase();
+        document.querySelectorAll('.book-card').forEach(c => {
+            c.style.display = c.innerText.toUpperCase().includes(val) ? "flex" : "none";
+        });
+    };
+</script>
+</body>
+</html>

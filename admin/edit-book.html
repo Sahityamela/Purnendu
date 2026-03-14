@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Book - Sahitya Mela</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root { --main: #8B0000; --bg: #f4f4f4; --danger: #dc3545; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; padding: 0; }
+
+        /* --- FIXED NAVIGATION HEADER --- */
+        .admin-nav {
+            background: white; padding: 10px 15px;
+            display: flex; justify-content: space-between; align-items: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1); position: sticky; top: 0; z-index: 1000;
+        }
+        .nav-btn { text-decoration: none; color: #444; font-weight: bold; font-size: 0.85rem; display: flex; align-items: center; gap: 8px; }
+        .nav-btn i { font-size: 1.1rem; color: var(--main); }
+
+        .container { padding: 15px; padding-bottom: 40px; }
+        .form-card { max-width: 800px; margin: auto; background: white; padding: 25px; border-radius: 15px; box-shadow: 0 5px 20px rgba(0,0,0,0.05); }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .form-group { margin-bottom: 18px; }
+        label { display: block; font-weight: bold; margin-bottom: 6px; font-size: 0.9rem; color: #333; }
+        input, select, textarea { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 8px; box-sizing: border-box; font-size: 1rem; outline: none; }
+        
+        /* --- ADJUSTED PREVIEW SIZE --- */
+        .preview-wrapper { position: relative; display: inline-block; margin-top: 10px; }
+        .preview-wrapper img { 
+            width: 90px;        /* Reduced width for better layout */
+            height: 120px;      /* Reduced height to match Add Book style */
+            object-fit: contain; 
+            border: 2px solid var(--main); 
+            border-radius: 8px; 
+            background: #f9f9f9;
+        }
+        
+        /* Gallery Preview Styling */
+        .gallery-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); gap: 10px; margin-top: 10px; padding: 10px; border: 1px dashed #ccc; border-radius: 8px; }
+        .g-item { position: relative; width: 80px; height: 80px; border-radius: 5px; overflow: hidden; border: 1px solid #ddd; }
+        .g-item img { width: 100%; height: 100%; object-fit: cover; }
+        
+        .remove-btn { 
+            position: absolute; top: 2px; right: 2px; background: var(--danger); 
+            color: white; border: none; border-radius: 50%; width: 22px; height: 22px; 
+            cursor: pointer; font-size: 10px; display: flex; align-items: center; justify-content: center; 
+        }
+
+        .progress-box { width: 100%; background: #eee; height: 30px; border-radius: 8px; margin: 25px 0; display: none; overflow: hidden; }
+        .bar { width: 0%; height: 100%; background: #28a745; color: white; text-align: center; line-height: 30px; font-size: 12px; transition: 0.3s; font-weight: bold; }
+        
+        #saveBtn { width: 100%; padding: 16px; background: var(--main); color: white; border: none; border-radius: 10px; font-weight: bold; font-size: 1.1rem; cursor: pointer; }
+
+        @media (max-width: 600px) { .grid { grid-template-columns: 1fr; } .nav-text { display: none; } }
+    </style>
+</head>
+<body>
+
+<header class="admin-nav">
+    <a href="manage-books.html" class="nav-btn"><i class="fas fa-arrow-left"></i> <span class="nav-text">Back to Manager</span></a>
+    <div style="display: flex; gap: 15px;">
+        <a href="admin-dashboard.html" class="nav-btn"><i class="fas fa-th-large"></i> <span class="nav-text">Dashboard</span></a>
+        <a href="../index.html" class="nav-btn"><i class="fas fa-external-link-alt"></i> <span class="nav-text">View Site</span></a>
+    </div>
+</header>
+
+<div class="container">
+    <div class="form-card">
+        <h2 style="text-align: center; color: var(--main); margin: 0 0 20px;"><i class="fas fa-edit"></i> Edit Book Details</h2>
+        
+        <div class="grid">
+            <div class="form-group"><label>Book Title *</label><input type="text" id="title" required></div>
+            <div class="form-group"><label>Author/Editor *</label><input type="text" id="author" required></div>
+        </div>
+
+        <div class="grid">
+            <div class="form-group">
+                <label>Category</label>
+                <select id="category">
+                    <option value="General">General</option>
+                    <option value="Poetry">Poetry</option>
+                    <option value="Novel">Novel</option>
+                    <option value="Short Story">Short Story</option>
+                    <option value="Essay">Essay</option>
+                </select>
+            </div>
+            <div class="form-group"><label>Language</label><input type="text" id="language"></div>
+        </div>
+
+        <div class="grid">
+            <div class="form-group"><label>Publication Date</label><input type="date" id="pubDate"></div>
+            <div class="form-group"><label>ISBN</label><input type="text" id="isbn"></div>
+        </div>
+
+        <div class="grid">
+            <div class="form-group"><label>Pages</label><input type="number" id="pages"></div>
+            <div class="form-group"><label>Price (৳)</label><input type="text" id="price"></div>
+        </div>
+
+        <div class="form-group"><label>Publisher</label><input type="text" id="publisher"></div>
+        <div class="form-group"><label>Description</label><textarea id="description" rows="3"></textarea></div>
+
+        <hr>
+        <h3>Update Media (Optional)</h3>
+        
+        <div class="grid">
+            <div class="form-group">
+                <label>Change Cover Image</label>
+                <input type="file" id="coverInput" accept="image/*" onchange="handleNewCover(this)">
+                <div id="coverPrevArea" class="preview-wrapper"><img id="mainPrev" src="../assets/images/logo.png"></div>
+            </div>
+            <div class="form-group">
+                <label>Update PDF File</label>
+                <input type="file" id="pdfFile" accept=".pdf">
+                <div id="pdfStatus" style="font-size:0.8rem; color:#666; margin-top:5px;">Checking PDF...</div>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label>Manage Gallery</label>
+            <div id="galleryManager" class="gallery-container"></div>
+            
+            <label style="margin-top:15px;">Add New Photos</label>
+            <input type="file" id="galleryInput" accept="image/*" multiple onchange="handleNewGallery(this)">
+            <div id="newGPreview" class="gallery-container" style="border-color: green;"></div>
+        </div>
+
+        <div class="progress-box" id="pBox"><div class="bar" id="pBar">0%</div></div>
+        <button id="saveBtn">Save All Changes</button>
+    </div>
+</div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getDatabase, ref, get, update } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyCftWFc6WvMbaY_iwF6DUawi7Qvf0SRKYc",
+        authDomain: "sahitya-mela.firebaseapp.com",
+        databaseURL: "https://sahitya-mela-default-rtdb.firebaseio.com",
+        projectId: "sahitya-mela",
+        storageBucket: "sahitya-mela.firebasestorage.app",
+        messagingSenderId: "283544938564",
+        appId: "1:283544938564:web:b9bba32cca9e52e6aab411"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwXhWXp5ZoGl_WxK3See1T4QRttFEWMtqSkO5zNq2ojxgB0JGAOTmgn8zPthJ1AXvGB/exec";
+
+    const bookId = new URLSearchParams(window.location.search).get('id');
+    const bookRef = ref(db, 'books/' + bookId);
+
+    window.existingGallery = [];
+    let newCoverFile = null;
+    let newGalleryFiles = [];
+
+    get(bookRef).then((s) => {
+        if (s.exists()) {
+            const d = s.val();
+            document.getElementById('title').value = d.title || "";
+            document.getElementById('author').value = d.author || "";
+            document.getElementById('category').value = d.category || "General";
+            document.getElementById('language').value = d.language || "";
+            document.getElementById('pubDate').value = d.pubDate || "";
+            document.getElementById('isbn').value = d.isbn || "";
+            document.getElementById('pages').value = d.pages || "";
+            document.getElementById('price').value = d.price || "";
+            document.getElementById('publisher').value = d.publisher || "";
+            document.getElementById('description').value = d.description || "";
+            
+            if(d.coverUrl) document.getElementById('mainPrev').src = d.coverUrl;
+            document.getElementById('pdfStatus').innerText = d.pdfUrl ? "✅ PDF exists." : "❌ No PDF.";
+            window.existingGallery = d.gallery || [];
+            renderExistingGallery();
+        }
+    });
+
+    function renderExistingGallery() {
+        const container = document.getElementById('galleryManager');
+        container.innerHTML = "";
+        window.existingGallery.forEach((url, i) => {
+            const div = document.createElement('div');
+            div.className = 'g-item';
+            div.innerHTML = `<img src="${url}"><button class="remove-btn" onclick="removeOldImg(${i})">X</button>`;
+            container.appendChild(div);
+        });
+    }
+
+    window.removeOldImg = (i) => {
+        if(confirm("Remove this image?")) {
+            window.existingGallery.splice(i, 1);
+            renderExistingGallery();
+        }
+    };
+
+    window.handleNewCover = (input) => {
+        if (input.files[0]) {
+            newCoverFile = input.files[0];
+            document.getElementById('mainPrev').src = URL.createObjectURL(newCoverFile);
+        }
+    };
+
+    window.handleNewGallery = (input) => {
+        newGalleryFiles = Array.from(input.files);
+        const container = document.getElementById('newGPreview');
+        container.innerHTML = "";
+        newGalleryFiles.forEach((file, i) => {
+            const div = document.createElement('div');
+            div.className = 'g-item';
+            div.innerHTML = `<img src="${URL.createObjectURL(file)}"><button class="remove-btn" onclick="removeNewImg(${i})">X</button>`;
+            container.appendChild(div);
+        });
+    };
+
+    window.removeNewImg = (i) => {
+        newGalleryFiles.splice(i, 1);
+        const container = document.getElementById('newGPreview');
+        container.innerHTML = "";
+        newGalleryFiles.forEach((file, idx) => {
+            const div = document.createElement('div');
+            div.className = 'g-item';
+            div.innerHTML = `<img src="${URL.createObjectURL(file)}"><button class="remove-btn" onclick="removeNewImg(${idx})">X</button>`;
+            container.appendChild(div);
+        });
+    };
+
+    async function upload(file) {
+        return new Promise((resolve) => {
+            const r = new FileReader();
+            r.onload = async () => {
+                const base64 = r.result.split(',')[1];
+                const res = await fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ base64, type: file.type, name: file.name }) });
+                const d = await res.json();
+                resolve(d.id);
+            };
+            r.readAsDataURL(file);
+        });
+    }
+
+    document.getElementById('saveBtn').onclick = async () => {
+        const btn = document.getElementById('saveBtn');
+        btn.disabled = true;
+        let updateData = {
+            title: document.getElementById('title').value,
+            author: document.getElementById('author').value,
+            category: document.getElementById('category').value,
+            language: document.getElementById('language').value,
+            pubDate: document.getElementById('pubDate').value,
+            isbn: document.getElementById('isbn').value,
+            pages: document.getElementById('pages').value,
+            price: document.getElementById('price').value,
+            publisher: document.getElementById('publisher').value,
+            description: document.getElementById('description').value,
+            gallery: [...window.existingGallery]
+        };
+
+        try {
+            if(newCoverFile) {
+                const id = await upload(newCoverFile);
+                updateData.coverUrl = `https://lh3.googleusercontent.com/d/$${id}`;
+            }
+            // PDF and Gallery logic here...
+            await update(bookRef, updateData);
+            alert("✅ Success!");
+            location.href = "manage-books.html";
+        } catch(e) { alert(e); btn.disabled = false; }
+    };
+</script>
+</body>
+</html>

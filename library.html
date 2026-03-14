@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Library - Sahitya Mela</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+Bengali:wght@400;700&family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root { --main: #8B0000; --bg: #f4f4f4; --footer-bg: #2c3e50; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: var(--bg); margin: 0; padding: 0; min-height: 100vh; }
+
+        /* NAVBAR */
+        .navbar { background: white; padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.1); position: sticky; top: 0; z-index: 1000; }
+        .nav-logo { display: flex; align-items: center; text-decoration: none; gap: 10px; }
+        .nav-logo img { height: 40px; }
+        .nav-logo span { color: var(--main); font-weight: bold; font-size: 1.2rem; font-family: 'Playfair Display', serif; }
+        .nav-links { display: flex; gap: 20px; align-items: center; }
+        .nav-links a { text-decoration: none; color: #333; font-weight: 600; font-size: 0.9rem; }
+        .nav-links a:hover, .nav-links a.active { color: var(--main); }
+        .menu-toggle { display: none; font-size: 1.5rem; cursor: pointer; color: var(--main); }
+
+        /* Banner Area */
+        .top-banner { background: linear-gradient(135deg, #8B0000 0%, #4a0000 100%); color: white; padding: 60px 20px; text-align: center; }
+        .top-banner h1 { margin: 0; font-size: 2.2rem; font-family: 'Playfair Display', serif; }
+
+        /* Container */
+        .container { max-width: 1100px; margin: -35px auto 40px; padding: 0 15px; box-sizing: border-box; }
+        .search-container { background: white; padding: 10px 20px; border-radius: 50px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); display: flex; align-items: center; width: 100%; max-width: 550px; margin: 0 auto 30px; border: 1px solid #eee; box-sizing: border-box; }
+        .search-container input { flex: 1; border: none; padding: 12px 15px; font-size: 1rem; outline: none; }
+
+        .books-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 25px; }
+        
+        /* --- MOBILE TOUCH OPTIMIZATION --- */
+        .book-card {
+            cursor: pointer;
+            position: relative;
+            -webkit-tap-highlight-color: transparent;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        
+        .book-card:active {
+            transform: scale(0.98);
+            background-color: #f0f0f0;
+        }
+        
+        .book-card a {
+            pointer-events: none;
+        }
+        
+        .explore-btn {
+            pointer-events: none;
+        }
+        
+        .book-card { background: white; border-radius: 15px; overflow: hidden; border: 1px solid #eee; transition: 0.3s; display: flex; flex-direction: column; text-align: center; }
+        .book-card:hover { transform: translateY(-8px); }
+        .book-img-box { width: 100%; height: 260px; background: #fafafa; display: flex; align-items: center; justify-content: center; padding: 15px; box-sizing: border-box; }
+        .book-card img { max-width: 100%; max-height: 100%; object-fit: contain; }
+        .book-info { padding: 20px; flex-grow: 1; }
+        .explore-btn { background: var(--main); color: white; text-decoration: none; padding: 12px; border-radius: 10px; font-weight: bold; display: block; margin-top: 10px; }
+
+        /* FOOTER */
+        .footer { background: var(--footer-bg); color: white; padding: 50px 20px 20px; }
+        .footer-container { max-width: 1200px; margin: auto; display: grid; grid-template-columns: 1.5fr 1fr 1fr 1.2fr; gap: 40px; }
+        .footer h4 { color: #fff; margin-bottom: 20px; position: relative; font-size: 1.2rem; }
+        .footer ul { list-style: none; padding: 0; }
+        .footer ul li { margin-bottom: 12px; }
+        .footer ul li a { color: #bdc3c7; text-decoration: none; transition: 0.3s; }
+        .fb-icon { display: inline-flex; align-items: center; justify-content: center; width: 35px; height: 35px; background: #8b0000; color: white; border-radius: 50%; text-decoration: none; margin-top: 10px; }
+
+        @media (max-width: 768px) {
+            .nav-links { display: none; flex-direction: column; position: absolute; top: 60px; left: 0; width: 100%; background: white; padding: 20px; box-shadow: 0 5px 10px rgba(0,0,0,0.1); gap: 15px; }
+            .nav-links.active { display: flex; }
+            .menu-toggle { display: block; }
+            .footer-container { grid-template-columns: 1fr; text-align: center; }
+            .books-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<nav class="navbar">
+    <a href="index.html" class="nav-logo">
+        <img src="assets/images/logo.png" alt="Logo">
+        <span>SAHITYA MELA</span>
+    </a>
+    <div class="nav-links" id="navLinks">
+        <a href="index.html">Home</a>
+        <a href="about.html">About</a>
+        <a href="library.html" class="active">Library</a>
+        <a href="contact.html">Contact</a>
+    </div>
+    <i class="fas fa-bars menu-toggle" id="menuBtn"></i>
+</nav>
+
+<div class="top-banner">
+    <h1><i class="fas fa-book-reader"></i> Sahitya Mela Library</h1>
+    <p>Explore our literary world</p>
+</div>
+
+<div class="container">
+    <div class="search-container">
+        <i class="fas fa-search"></i>
+        <input type="text" id="searchInput" placeholder="Search by title or author..." onkeyup="filterBooks()">
+    </div>
+    <div id="loader" style="text-align:center; padding:50px; color:var(--main); font-weight:bold;"><i class="fas fa-spinner fa-spin"></i> Loading...</div>
+    <div id="booksContainer" class="books-grid" style="display: none;"></div>
+</div>
+
+<footer class="footer">
+    <div class="footer-container">
+        <div>
+            <img src="assets/images/logo.png" height="60" alt="Logo">
+            <h3>SAHITYA MELA</h3>
+            <p style="color: #bdc3c7;">50 Years of Literary Excellence</p>
+        </div>
+        <div>
+            <h4>Quick Links</h4>
+            <ul><li><a href="index.html">Home</a></li><li><a href="about.html">About Us</a></li><li><a href="library.html">Library</a></li></ul>
+        </div>
+        <div>
+            <h4>Literature</h4>
+            <ul><li><a href="#">Our History</a></li><li><a href="#">Submit Writing</a></li><li><a href="#">Publications</a></li></ul>
+        </div>
+        <div>
+            <h4>Contact Us</h4>
+            <p><i class="fas fa-envelope"></i> sahityamela64@gmail.com</p>
+            <p><i class="fas fa-phone"></i> 8240531141</p>
+            <a href="https://www.facebook.com/share/18Wdg7Qvm7/" target="_blank" class="fb-icon"><i class="fab fa-facebook-f"></i></a>
+        </div>
+    </div>
+    <div style="text-align:center; margin-top:40px; color:#bdc3c7; font-size:0.8rem;">(All rights reserved by SAHITYA MELA)</div>
+</footer>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyCftWFc6WvMbaY_iwF6DUawi7Qvf0SRKYc",
+        authDomain: "sahitya-mela.firebaseapp.com",
+        databaseURL: "https://sahitya-mela-default-rtdb.firebaseio.com",
+        projectId: "sahitya-mela",
+        storageBucket: "sahitya-mela.firebasestorage.app",
+        messagingSenderId: "283544938564",
+        appId: "1:283544938564:web:b9bba32cca9e52e6aab411"
+    };
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+
+    document.getElementById('menuBtn').onclick = () => document.getElementById('navLinks').classList.toggle('active');
+
+    function fixUrl(url) {
+        if (!url) return "assets/images/logo.png";
+        let id = "";
+        if (url.includes('id=')) id = url.split('id=')[1].split('&')[0];
+        else if (url.includes('{')) id = url.split('{')[1].split('}')[0];
+        else if (url.includes('/d/')) id = url.split('/d/')[1].split('/')[0];
+        return id ? `https://lh3.googleusercontent.com/d/${id}` : url;
+    }
+
+    onValue(ref(db, 'books'), (snapshot) => {
+        const container = document.getElementById('booksContainer');
+        container.innerHTML = '';
+        if (snapshot.exists()) {
+            snapshot.forEach((child) => {
+                const b = child.val();
+                const id = child.key;
+                
+                // Create the card element
+                const card = document.createElement('div');
+                card.className = 'book-card';
+                
+                // MAKE FULL CARD TOUCHABLE
+                card.onclick = () => {
+                    window.location.href = `book-reader.html?id=${id}`;
+                };
+                
+                card.innerHTML = `<div class="book-img-box"><img src="${fixUrl(b.coverUrl)}" onerror="this.src='assets/images/logo.png'"></div><div class="book-info"><h3>${b.title}</h3><p>By ${b.author}</p><div style="font-weight:bold; color:var(--main); margin-bottom:10px;">${b.price ? '৳'+b.price : 'Free'}</div><span class="explore-btn">Explore Book</span></div>`;
+                container.appendChild(card);
+            });
+            document.getElementById('loader').style.display = 'none';
+            container.style.display = 'grid';
+        }
+    });
+
+    window.filterBooks = () => {
+        const val = document.getElementById('searchInput').value.toUpperCase();
+        document.querySelectorAll('.book-card').forEach(c => { c.style.display = c.innerText.toUpperCase().includes(val) ? "flex" : "none"; });
+    };
+</script>
+</body>
+</html>

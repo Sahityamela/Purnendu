@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Message Center - SAHITYA MELA</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <style>
+        :root { --main: #8B0000; --bg: #f4f7f6; --white: #ffffff; }
+        
+        body { font-family: 'Poppins', sans-serif; background: var(--bg); margin: 0; overflow-x: hidden; }
+
+        /* --- SECURITY GATEKEEPER SCREEN --- */
+        #auth-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: white; display: flex; flex-direction: column;
+            align-items: center; justify-content: center; z-index: 10000;
+        }
+
+        /* --- NAVIGATION --- */
+        .admin-header { 
+            background: var(--white); padding: 12px 20px; display: flex; 
+            align-items: center; justify-content: space-between; 
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1); position: sticky; top: 0; z-index: 1000; 
+        }
+        .menu-btn { cursor: pointer; background: none; border: none; font-size: 1.5rem; color: var(--main); }
+        
+        /* Sidebar Panel */
+        .admin-sidebar { 
+            position: fixed; left: -285px; top: 0; bottom: 0; width: 280px; 
+            background: var(--white); z-index: 9999; transition: 0.3s; 
+            box-shadow: 2px 0 15px rgba(0,0,0,0.1); 
+        }
+        .admin-sidebar.active { left: 0; }
+        .admin-menu ul { list-style: none; padding: 20px 0; margin: 0; }
+        .admin-menu li a { 
+            display: flex; align-items: center; gap: 12px; padding: 15px 25px; 
+            text-decoration: none; color: #444; font-weight: 500; border-bottom: 1px solid #eee; 
+        }
+        .admin-menu li a:hover, .admin-menu li a.active { background: #fff5f5; color: var(--main); border-right: 4px solid var(--main); }
+        
+        .backdrop { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 9998; display: none; }
+        .backdrop.active { display: block; }
+
+        /* --- CONTENT AREA --- */
+        .main-container { padding: 30px; max-width: 1000px; margin: auto; }
+        .page-title { font-family: 'Playfair Display', serif; color: var(--main); font-size: 2rem; margin-bottom: 25px; }
+        
+        .stats-banner { 
+            background: var(--white); padding: 25px; border-radius: 15px; 
+            text-align: center; margin-bottom: 30px; box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            border-bottom: 5px solid var(--main);
+        }
+
+        .message-card { 
+            background: var(--white); border-radius: 15px; padding: 25px; 
+            margin-bottom: 20px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); 
+            border-left: 6px solid var(--main); transition: 0.3s;
+        }
+        .message-card:hover { transform: scale(1.01); }
+        
+        .msg-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        .sender-info h3 { margin: 0; color: var(--main); font-size: 1.2rem; }
+        .sender-info span { font-size: 0.85rem; color: #888; }
+        
+        .msg-body { color: #333; line-height: 1.6; font-size: 1rem; background: #fdfdfd; padding: 15px; border-radius: 8px; border: 1px solid #f0f0f0; }
+        
+        .msg-meta { margin-top: 15px; font-size: 0.9rem; color: #666; display: flex; gap: 20px; flex-wrap: wrap; }
+        .msg-meta i { color: var(--main); width: 20px; }
+
+        .btn-delete { 
+            background: #fff0f0; color: #d32f2f; border: 1px solid #ffcdd2; 
+            padding: 8px 15px; border-radius: 8px; cursor: pointer; transition: 0.3s; font-weight: 600;
+        }
+        .btn-delete:hover { background: #d32f2f; color: white; }
+
+        /* Logout Button */
+        .logout-btn { background: var(--main); color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: 600; }
+    </style>
+</head>
+<body>
+
+<div id="auth-overlay">
+    <i class="fas fa-feather-alt fa-spin" style="font-size: 3rem; color: var(--main); margin-bottom: 20px;"></i>
+    <p style="font-weight: 600; color: #444;">Securing Literary Portal...</p>
+</div>
+
+<header class="admin-header">
+    <div style="display: flex; align-items: center; gap: 15px;">
+        <button class="menu-btn" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
+        <div style="display: flex; align-items: center; gap: 10px;">
+            <img src="../assets/images/logo.png" alt="Logo" style="height: 40px;" onerror="this.src='https://via.placeholder.com/40'">
+            <span style="font-weight: bold; color: var(--main); font-size: 1.1rem;">Sahitya Mela</span>
+        </div>
+    </div>
+    <button class="logout-btn" onclick="AdminLogout()">Logout</button>
+</header>
+
+<aside class="admin-sidebar" id="sidebar">
+    <nav class="admin-menu">
+        <ul>
+            <li><a href="dashboard.html"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+            <li><a href="manage-books.html"><i class="fas fa-book"></i> Manage Books</a></li>
+            <li><a href="add-book.html"><i class="fas fa-plus-circle"></i> Add New Book</a></li>
+            <li><a href="messages.html" class="active"><i class="fas fa-envelope"></i> Messages</a></li>
+            <li><a href="../index.html" target="_blank"><i class="fas fa-external-link-alt"></i> View Site</a></li>
+        </ul>
+    </nav>
+</aside>
+<div class="backdrop" id="backdrop" onclick="toggleSidebar()"></div>
+
+<main class="main-container">
+    <h1 class="page-title">Reader Inquiries</h1>
+
+    <div class="stats-banner">
+        <h2 id="msgCount" style="margin:0; font-size: 2.5rem; color: var(--main);">0</h2>
+        <p style="margin:0; color: #777; font-weight: 600; text-transform: uppercase; letter-spacing: 1px;">Total Messages Received</p>
+    </div>
+
+    <div id="messageList">
+        <p style="text-align: center; color: #888;">Fetching communications...</p>
+    </div>
+</main>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+    import { getDatabase, ref, onValue, remove } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyCftWFc6WvMbaY_iwF6DUawi7Qvf0SRKYc",
+        authDomain: "sahitya-mela.firebaseapp.com",
+        projectId: "sahitya-mela",
+        storageBucket: "sahitya-mela.firebasestorage.app",
+        messagingSenderId: "283544938564",
+        appId: "1:283544938564:web:b9bba32cca9e52e6aab411",
+        databaseURL: "https://sahitya-mela-default-rtdb.firebaseio.com"
+    };
+
+    // Initialize
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getDatabase(app);
+
+    // --- 🛡️ SECURITY CHECK ---
+    onAuthStateChanged(auth, (user) => {
+        if (user && user.email === 'sahityamela64@gmail.com') {
+            document.getElementById('auth-overlay').style.display = 'none';
+            fetchMessages();
+        } else {
+            window.location.href = "login.html";
+        }
+    });
+
+    // --- ✉️ FETCH MESSAGES ---
+    function fetchMessages() {
+        const msgRef = ref(db, 'messages');
+        onValue(msgRef, (snapshot) => {
+            const list = document.getElementById('messageList');
+            const counter = document.getElementById('msgCount');
+            list.innerHTML = '';
+
+            if (snapshot.exists()) {
+                const data = snapshot.val();
+                const keys = Object.keys(data).reverse(); // Newest first
+                counter.innerText = keys.length;
+
+                keys.forEach(key => {
+                    const m = data[key];
+                    const time = m.timestamp ? new Date(m.timestamp).toLocaleString() : "Recently";
+                    
+                    list.innerHTML += `
+                        <div class="message-card">
+                            <div class="msg-header">
+                                <div class="sender-info">
+                                    <h3>${m.name || 'Anonymous Reader'}</h3>
+                                    <span><i class="far fa-clock"></i> ${time}</span>
+                                </div>
+                                <button class="btn-delete" onclick="confirmDelete('${key}')">
+                                    <i class="fas fa-trash-alt"></i> Delete
+                                </button>
+                            </div>
+                            <div class="msg-body">${m.message}</div>
+                            <div class="msg-meta">
+                                <span><i class="fas fa-envelope"></i> ${m.email}</span>
+                                <span><i class="fas fa-phone-alt"></i> ${m.phone}</span>
+                            </div>
+                        </div>`;
+                });
+            } else {
+                counter.innerText = "0";
+                list.innerHTML = '<div style="text-align:center; padding: 50px; color:#aaa;">No messages in the inbox.</div>';
+            }
+        });
+    }
+
+    // --- UTILS ---
+    window.toggleSidebar = () => {
+        document.getElementById('sidebar').classList.toggle('active');
+        document.getElementById('backdrop').classList.toggle('active');
+    };
+
+    window.AdminLogout = () => {
+        if(confirm("Sign out of the admin session?")) {
+            signOut(auth).then(() => window.location.href = "login.html");
+        }
+    };
+
+    window.confirmDelete = (id) => {
+        if(confirm("Are you sure you want to permanently delete this message?")) {
+            remove(ref(db, 'messages/' + id));
+        }
+    };
+</script>
+
+</body>
+</html>
