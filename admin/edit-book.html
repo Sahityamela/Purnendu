@@ -26,22 +26,22 @@
         .progress-box { width: 100%; background: #eee; height: 35px; border-radius: 8px; margin: 25px 0; display: none; overflow: hidden; position: relative; }
         .bar { width: 0%; height: 100%; background: #28a745; color: white; text-align: center; line-height: 35px; font-size: 13px; transition: 0.3s; font-weight: bold; }
         #saveBtn { width: 100%; padding: 16px; background: var(--main); color: white; border: none; border-radius: 10px; font-weight: bold; font-size: 1.1rem; cursor: pointer; }
-        @media (max-width: 600px) { .grid { grid-template-columns: 1fr; } .nav-text { display: none; } }
+        .pdf-preview { width: 100%; height: 200px; border: 1px solid #ddd; border-radius: 8px; margin-top: 10px; display: none; }
     </style>
 </head>
 <body>
 
 <header class="admin-nav">
-    <a href="manage-books.html" class="nav-btn"><i class="fas fa-arrow-left"></i> <span class="nav-text">Back to Manager</span></a>
+    <a href="manage-books.html" class="nav-btn"><i class="fas fa-arrow-left"></i> <span class="nav-text">Back</span></a>
     <div style="display: flex; gap: 15px;">
         <a href="dashboard.html" class="nav-btn"><i class="fas fa-th-large"></i> <span class="nav-text">Dashboard</span></a>
-        <a href="../index.html" class="nav-btn"><i class="fas fa-external-link-alt"></i> <span class="nav-text">View Site</span></a>
     </div>
 </header>
 
 <div class="container">
     <div class="form-card">
-        <h2 style="text-align: center; color: var(--main); margin: 0 0 20px;"><i class="fas fa-edit"></i> Edit Book Details</h2>
+        <h2 style="text-align: center; color: var(--main); margin-bottom: 20px;">Edit Book Details</h2>
+        
         <div class="grid">
             <div class="form-group"><label>Book Title *</label><input type="text" id="title" required></div>
             <div class="form-group"><label>Author/Editor *</label><input type="text" id="author" required></div>
@@ -62,26 +62,29 @@
         <div class="form-group"><label>Description</label><textarea id="description" rows="3"></textarea></div>
 
         <hr>
-        <h3>Update Media (Optional)</h3>
+        <h3>Media Updates</h3>
         <div class="grid">
             <div class="form-group">
-                <label>Change Cover Image</label>
+                <label>Cover Image</label>
                 <input type="file" id="coverInput" accept="image/*" onchange="handleNewCover(this)">
-                <div id="coverPrevArea" class="preview-wrapper"><img id="mainPrev" src="../assets/images/logo.png"></div>
+                <div class="preview-wrapper"><img id="mainPrev" src=""></div>
             </div>
             <div class="form-group">
-                <label>Update PDF File</label>
-                <input type="file" id="pdfFile" accept=".pdf">
-                <div id="pdfStatus" style="font-size:0.8rem; color:#666; margin-top:5px;">Checking PDF...</div>
+                <label>PDF File</label>
+                <div style="display: flex; gap: 5px;">
+                    <input type="file" id="pdfFile" accept=".pdf">
+                    <button id="delPdfBtn" style="background:var(--danger); color:white; border:none; padding:10px; border-radius:8px; cursor:pointer; display:none;">Delete</button>
+                </div>
+                <iframe id="pdfPrev" class="pdf-preview"></iframe>
             </div>
         </div>
 
         <div class="form-group">
-            <label>Manage Gallery</label>
+            <label>Gallery</label>
             <div id="galleryManager" class="gallery-container"></div>
-            <label style="margin-top:15px;">Add New Photos</label>
-            <input type="file" id="galleryInput" accept="image/*" multiple onchange="handleNewGallery(this)">
-            <div id="newGPreview" class="gallery-container" style="border-color: green;"></div>
+            <label style="margin-top:10px;">Add New Photos</label>
+            <input type="file" id="galleryInput" multiple accept="image/*" onchange="handleNewGallery(this)">
+            <div id="newGPreview" class="gallery-container"></div>
         </div>
 
         <div class="progress-box" id="pBox"><div class="bar" id="pBar">0%</div></div>
@@ -92,6 +95,7 @@
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getDatabase, ref, get, update } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
     const firebaseConfig = {
         apiKey: "AIzaSyCftWFc6WvMbaY_iwF6DUawi7Qvf0SRKYc",
@@ -105,14 +109,18 @@
 
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
+    const auth = getAuth(app);
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwXhWXp5ZoGl_WxK3See1T4QRttFEWMtqSkO5zNq2ojxgB0JGAOTmgn8zPthJ1AXvGB/exec";
 
     const bookId = new URLSearchParams(window.location.search).get('id');
     const bookRef = ref(db, 'books/' + bookId);
 
     window.existingGallery = [];
+    let currentPdfUrl = null;
     let newCoverFile = null;
     let newGalleryFiles = [];
+
+    onAuthStateChanged(auth, (user) => { if (!user) window.location.href = "login.html"; });
 
     get(bookRef).then((s) => {
         if (s.exists()) {
@@ -127,8 +135,14 @@
             document.getElementById('price').value = d.price || "";
             document.getElementById('publisher').value = d.publisher || "";
             document.getElementById('description').value = d.description || "";
-            if(d.coverUrl) document.getElementById('mainPrev').src = d.coverUrl;
-            document.getElementById('pdfStatus').innerText = d.pdfUrl ? "✅ PDF exists." : "❌ No PDF.";
+            document.getElementById('mainPrev').src = d.coverUrl || "";
+            
+            if(d.pdfUrl) {
+                currentPdfUrl = d.pdfUrl;
+                document.getElementById('pdfPrev').src = d.pdfUrl;
+                document.getElementById('pdfPrev').style.display = 'block';
+                document.getElementById('delPdfBtn').style.display = 'block';
+            }
             window.existingGallery = d.gallery || [];
             renderExistingGallery();
         }
@@ -145,12 +159,15 @@
         });
     }
 
-    window.removeOldImg = (i) => {
-        if(confirm("Remove this image?")) { window.existingGallery.splice(i, 1); renderExistingGallery(); }
-    };
+    window.removeOldImg = (i) => { window.existingGallery.splice(i, 1); renderExistingGallery(); };
+    window.handleNewCover = (input) => { if (input.files[0]) { newCoverFile = input.files[0]; document.getElementById('mainPrev').src = URL.createObjectURL(newCoverFile); } };
 
-    window.handleNewCover = (input) => {
-        if (input.files[0]) { newCoverFile = input.files[0]; document.getElementById('mainPrev').src = URL.createObjectURL(newCoverFile); }
+    document.getElementById('delPdfBtn').onclick = () => {
+        if(confirm("Delete PDF from this book?")) {
+            currentPdfUrl = null;
+            document.getElementById('pdfPrev').style.display = 'none';
+            document.getElementById('delPdfBtn').style.display = 'none';
+        }
     };
 
     window.handleNewGallery = (input) => {
@@ -160,19 +177,7 @@
         newGalleryFiles.forEach((file, i) => {
             const div = document.createElement('div');
             div.className = 'g-item';
-            div.innerHTML = `<img src="${URL.createObjectURL(file)}"><button class="remove-btn" onclick="removeNewImg(${i})">X</button>`;
-            container.appendChild(div);
-        });
-    };
-
-    window.removeNewImg = (i) => {
-        newGalleryFiles.splice(i, 1);
-        const container = document.getElementById('newGPreview');
-        container.innerHTML = "";
-        newGalleryFiles.forEach((file, idx) => {
-            const div = document.createElement('div');
-            div.className = 'g-item';
-            div.innerHTML = `<img src="${URL.createObjectURL(file)}"><button class="remove-btn" onclick="removeNewImg(${idx})">X</button>`;
+            div.innerHTML = `<img src="${URL.createObjectURL(file)}">`;
             container.appendChild(div);
         });
     };
@@ -181,33 +186,21 @@
         return new Promise((resolve, reject) => {
             const r = new FileReader();
             r.onload = async () => {
+                const base64 = r.result.split(',')[1];
                 try {
-                    const base64 = r.result.split(',')[1];
-                    const res = await fetch(SCRIPT_URL, { 
-                        method: "POST", 
-                        mode: "no-cors", // Helps prevent sticking at 90%
-                        body: JSON.stringify({ base64, type: file.type, name: file.name }) 
-                    });
-                    // Note: with no-cors we can't read the response body directly 
-                    // However, we can assume if it didn't throw an error, it's sent.
-                    // For Drive Uploads, it's safer to use normal CORS if your script is set up.
-                    // Let's stick to standard and add a catch.
-                    const response = await fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ base64, type: file.type, name: file.name }) });
-                    const d = await response.json();
-                    if(d.id) resolve(d.id); else reject("Upload failed: No ID received");
-                } catch (err) { reject(err); }
+                    const res = await fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ base64, type: file.type, name: file.name }) });
+                    const d = await res.json();
+                    if(d.id) resolve(d.id); else reject("Drive Error");
+                } catch (e) { reject(e); }
             };
-            r.onerror = (e) => reject(e);
             r.readAsDataURL(file);
         });
     }
 
     function updateProg(pct, msg) {
-        const pBox = document.getElementById('pBox');
-        const pBar = document.getElementById('pBar');
-        pBox.style.display = 'block';
-        pBar.style.width = pct + "%";
-        pBar.innerText = `${msg} (${pct}%)`;
+        document.getElementById('pBox').style.display = 'block';
+        document.getElementById('pBar').style.width = pct + "%";
+        document.getElementById('pBar').innerText = msg;
     }
 
     document.getElementById('saveBtn').onclick = async () => {
@@ -216,7 +209,6 @@
         btn.disabled = true;
 
         let updatedGallery = [...window.existingGallery];
-
         let updateData = {
             title: document.getElementById('title').value,
             author: document.getElementById('author').value,
@@ -227,41 +219,34 @@
             pages: document.getElementById('pages').value,
             price: document.getElementById('price').value,
             publisher: document.getElementById('publisher').value,
-            description: document.getElementById('description').value
+            description: document.getElementById('description').value,
+            pdfUrl: currentPdfUrl // Starts as existing, can be null if deleted
         };
 
         try {
             if(newCoverFile) {
-                updateProg(20, "Uploading Cover...");
+                updateProg(30, "Cover...");
                 const id = await upload(newCoverFile);
                 updateData.coverUrl = `https://lh3.googleusercontent.com/d/${id}`;
             }
             if(pFile) {
-                updateProg(50, "Uploading PDF...");
+                updateProg(50, "PDF...");
                 const id = await upload(pFile);
                 updateData.pdfUrl = `https://drive.google.com/file/d/${id}/preview`;
             }
             if(newGalleryFiles.length > 0) {
                 for(let i=0; i < newGalleryFiles.length; i++) {
-                    const step = Math.floor(60 + ((i+1)/newGalleryFiles.length * 30));
-                    updateProg(step, `Adding Photo ${i+1}/${newGalleryFiles.length}...`);
+                    updateProg(60 + i, "Photos...");
                     const id = await upload(newGalleryFiles[i]);
                     updatedGallery.push(`https://lh3.googleusercontent.com/d/${id}`);
                 }
             }
-
             updateData.gallery = updatedGallery;
-            updateProg(95, "Syncing...");
+            updateProg(95, "Saving...");
             await update(bookRef, updateData);
-            updateProg(100, "Success!");
-            alert("✅ Book updated successfully!");
+            alert("Success!");
             location.href = "manage-books.html";
-        } catch(e) { 
-            console.error(e); 
-            alert("Error: " + e.message); 
-            btn.disabled = false; 
-            document.getElementById('pBox').style.display = 'none';
-        }
+        } catch(e) { alert("Error: " + e.message); btn.disabled = false; }
     };
 </script>
 </body>
