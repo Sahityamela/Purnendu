@@ -6,130 +6,62 @@
     <title>Book Reader - Sahitya Mela</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        :root { --main: #8B0000; --bg: #f8f9fa; --text: #333; --border: #ddd; }
+        :root { --main: #8B0000; --bg: #f8f9fa; }
+        body, html { margin: 0; padding: 0; overflow-x: hidden; width: 100%; font-family: sans-serif; }
+        .main-reader-container { padding: 15px; display: flex; flex-direction: column; align-items: center; }
+        .book-hero-image { width: 100%; max-width: 350px; height: auto; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); margin-bottom: 20px; }
+        .nav-group { display: flex; width: 100%; gap: 10px; margin-bottom: 20px; }
+        .nav-group a { flex: 1; text-align: center; padding: 12px; border-radius: 8px; text-decoration: none; font-weight: bold; background: rgba(255,255,255,0.2); color: white; border: 1px solid rgba(255,255,255,0.3); }
         
-        /* --- GLOBAL MOBILE RESET --- */
-        body, html {
-            margin: 0;
-            padding: 0;
-            overflow-x: hidden; /* Prevents side-scrolling */
-            width: 100%;
-        }
+        /* Book Info Table */
+        .info-table { width: 100%; max-width: 500px; background: white; border-radius: 12px; padding: 15px; margin-top: 20px; color: #333; }
+        .info-row { display: flex; justify-content: space-between; border-bottom: 1px solid #eee; padding: 8px 0; font-size: 0.9rem; }
+        .info-label { font-weight: bold; color: var(--main); }
 
-        .main-reader-container {
-            padding: 15px;
-            box-sizing: border-box;
-            display: flex;
-            flex-direction: column;
-            align-items: center; /* Centers everything */
-        }
-
-        /* --- FIX: MAIN BOOK IMAGE --- */
-        .book-hero-image {
-            width: 100%;           /* Fills the screen width */
-            max-width: 450px;      /* But don't let it get huge on desktop */
-            height: auto;          /* Keeps the height perfect */
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-            margin-bottom: 20px;
-            display: block;
-        }
-
-        /* --- FIX: NAVIGATION BUTTONS --- */
-        .nav-group {
-            display: flex;
-            width: 100%;
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-        .nav-group a {
-            flex: 1; /* Makes buttons equal width */
-            text-align: center;
-            padding: 12px;
-            border-radius: 8px;
-            text-decoration: none;
-            font-weight: bold;
-            background: rgba(255,255,255,0.1);
-            color: white;
-        }
-
-        /* --- FIX: GALLERY THUMBNAILS --- */
-        .gallery-scroll {
-            display: flex;
-            overflow-x: auto; /* Allows side-swiping through gallery */
-            gap: 10px;
-            width: 100%;
-            padding: 10px 0;
-            scrollbar-width: none; /* Hides ugly scrollbar on Firefox */
-        }
-        .gallery-scroll::-webkit-scrollbar { display: none; } /* Hides scrollbar on Chrome */
-
-        .gallery-img {
-            width: 120px; 
-            height: 120px;
-            object-fit: cover;
-            border-radius: 10px;
-            flex-shrink: 0; /* Prevents images from getting squashed */
-        }
-
-        /* --- FIX: FULL SIZE PDF READER --- */
-        .pdf-viewer-section {
-            width: 100%;
-            margin-top: 30px;
-        }
-
-        .pdf-bar {
-            background: white;
-            padding: 10px 15px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-radius: 10px 10px 0 0;
-        }
-
-        #pdfFrame {
-            width: 100%;
-            height: 80vh; /* 80% of the screen height - MUCH BIGGER */
-            border: none;
-            background: #525659; /* Standard PDF background color */
-        }
-
-        /* Modal */
-        #imageModal {
-            display: none; position: fixed; z-index: 3000; top: 0; left: 0; 
-            width: 100%; height: 100%; background: rgba(0,0,0,0.9);
-            justify-content: center; align-items: center;
-        }
-        #imageModal img { max-width: 95%; max-height: 90%; border-radius: 5px; }
+        .gallery-scroll { display: flex; overflow-x: auto; gap: 10px; width: 100%; padding: 10px 0; }
+        .gallery-img { width: 120px; height: 120px; object-fit: cover; border-radius: 10px; flex-shrink: 0; cursor: pointer; }
+        .pdf-viewer-section { width: 100%; margin-top: 30px; }
+        .pdf-bar { background: white; padding: 10px 15px; display: flex; justify-content: space-between; align-items: center; border-radius: 10px 10px 0 0; }
+        #pdfFrame { width: 100%; height: 80vh; border: none; background: #525659; }
+        #imageModal { display: none; position: fixed; z-index: 3000; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); justify-content: center; align-items: center; }
+        #imageModal img { max-width: 95%; max-height: 90%; }
         .close-modal { position: absolute; top: 20px; right: 30px; color: white; font-size: 40px; cursor: pointer; }
     </style>
 </head>
 <body style="background: linear-gradient(180deg, #8B0000 0%, #4a0000 100%);">
 
 <div class="main-reader-container">
-    
     <div class="nav-group">
         <a href="index.html"><i class="fas fa-home"></i> Home</a>
         <a href="library.html"><i class="fas fa-book"></i> Library</a>
     </div>
 
-    <img src="assets/images/logo.png" class="book-hero-image" id="mainBookImg">
+    <img src="" class="book-hero-image" id="mainBookImg">
 
     <h1 id="bookTitle" style="color:white; text-align:center; margin:10px 0;"></h1>
-    <p id="bookAuthor" style="color:#ccc; font-style:italic;"></p>
+    <p id="bookAuthor" style="color:#ccc; font-style:italic; margin-bottom: 20px;"></p>
 
-    <div style="width:100%; color:white; font-weight:bold; margin-top:20px;">GALLERY (SWIPE LEFT)</div>
-    <div class="gallery-scroll" id="galleryArea">
+    <div class="info-table">
+        <div class="info-row"><span class="info-label">Category:</span> <span id="infoCategory">-</span></div>
+        <div class="info-row"><span class="info-label">Language:</span> <span id="infoLanguage">-</span></div>
+        <div class="info-row"><span class="info-label">Publication Date:</span> <span id="infoDate">-</span></div>
+        <div class="info-row"><span class="info-label">ISBN:</span> <span id="infoIsbn">-</span></div>
+        <div class="info-row"><span class="info-label">Pages:</span> <span id="infoPages">-</span></div>
+        <div class="info-row"><span class="info-label">Publisher:</span> <span id="infoPublisher">-</span></div>
+        <div class="info-row"><span class="info-label">Price:</span> <span id="infoPrice">-</span></div>
+        <div style="margin-top:10px; font-size:0.85rem; line-height:1.4;"><b class="info-label">Description:</b><br><span id="infoDesc"></span></div>
     </div>
+
+    <div style="width:100%; color:white; font-weight:bold; margin-top:30px;">GALLERY (SWIPE LEFT)</div>
+    <div class="gallery-scroll" id="galleryArea"></div>
 
     <div class="pdf-viewer-section">
         <div class="pdf-bar">
             <span style="color:#8B0000; font-weight:bold;"><i class="fas fa-file-pdf"></i> PDF READER</span>
-            <a href="#" id="downloadBtn" class="save-btn" style="background:#8B0000; color:white; padding:5px 15px; border-radius:5px; text-decoration:none;">Save</a>
+            <a href="#" id="downloadBtn" style="background:#8B0000; color:white; padding:5px 15px; border-radius:5px; text-decoration:none;">Download</a>
         </div>
         <iframe id="pdfFrame" src=""></iframe>
     </div>
-
 </div>
 
 <div id="imageModal"><span class="close-modal" onclick="closeLightbox()">×</span><img id="modalImg" src=""></div>
@@ -154,34 +86,36 @@
     const bookId = new URLSearchParams(window.location.search).get('id');
     const bookRef = ref(db, 'books/' + bookId);
 
-    // --- SECURE REPAIR LOGIC ---
-    function fixUrl(url) {
-        if (!url) return "assets/images/logo.png";
-        let id = "";
-        if (url.includes('id=')) id = url.split('id=')[1].split('&')[0];
-        else if (url.includes('{')) id = url.split('{')[1].split('}')[0];
-        else if (url.includes('/d/')) id = url.split('/d/')[1].split('/')[0];
-        
-        // This is the SECURE link (HTTPS)
-        return id ? `https://lh3.googleusercontent.com/d/${id}` : url;
-    }
-
     get(bookRef).then((snapshot) => {
         if (snapshot.exists()) {
-            const data = snapshot.val();
-            document.getElementById('mainBookImg').src = fixUrl(data.coverUrl);
-            document.getElementById('pdfFrame').src = data.pdfUrl;
-            document.getElementById('bookTitle').textContent = data.title;
-            document.getElementById('bookAuthor').textContent = 'By ' + data.author;
+            const d = snapshot.val();
+            document.getElementById('mainBookImg').src = d.coverUrl || "assets/images/logo.png";
+            document.getElementById('bookTitle').textContent = d.title;
+            document.getElementById('bookAuthor').textContent = 'By ' + d.author;
             
-            if (data.gallery && data.gallery.length > 0) {
+            // Populate Info Table
+            document.getElementById('infoCategory').textContent = d.category || "General";
+            document.getElementById('infoLanguage').textContent = d.language || "-";
+            document.getElementById('infoDate').textContent = d.pubDate || "-";
+            document.getElementById('infoIsbn').textContent = d.isbn || "-";
+            document.getElementById('infoPages').textContent = d.pages || "-";
+            document.getElementById('infoPublisher').textContent = d.publisher || "-";
+            document.getElementById('infoPrice').textContent = d.price ? '৳ ' + d.price : "-";
+            document.getElementById('infoDesc').textContent = d.description || "No description available.";
+
+            if(d.pdfUrl) {
+                document.getElementById('pdfFrame').src = d.pdfUrl;
+            } else {
+                document.querySelector('.pdf-viewer-section').style.display = 'none';
+            }
+            
+            if (d.gallery && d.gallery.length > 0) {
                 const gContainer = document.getElementById('galleryArea');
-                data.gallery.forEach(url => {
-                    const fixed = fixUrl(url);
+                d.gallery.forEach(url => {
                     const img = document.createElement('img');
-                    img.src = fixed;
+                    img.src = url;
                     img.className = 'gallery-img';
-                    img.onclick = () => openLightbox(fixed);
+                    img.onclick = () => openLightbox(url);
                     gContainer.appendChild(img);
                 });
             }
@@ -194,13 +128,11 @@
     };
     window.closeLightbox = () => { document.getElementById('imageModal').style.display = 'none'; };
     
-    // Download button functionality
     document.getElementById('downloadBtn').onclick = (e) => {
         e.preventDefault();
         const url = document.getElementById('pdfFrame').src;
         if(url) window.open(url.replace('/preview', '/view'), '_blank');
     };
 </script>
-
 </body>
 </html>
