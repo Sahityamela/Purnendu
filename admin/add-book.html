@@ -1,260 +1,126 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="bn">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Add New Book - Sahitya Mela</title>
+    <title>Add Book - Sahitya Mela Admin</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root { --main: #8B0000; --bg: #f4f4f4; --danger: #dc3545; }
         body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; padding: 0; }
-
-        /* --- FIXED NAVIGATION HEADER (Mobile Ready) --- */
-        .admin-nav {
-            background: white; padding: 10px 15px;
-            display: flex; justify-content: space-between; align-items: center;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1); position: sticky; top: 0; z-index: 1000;
-        }
-        .nav-btn { text-decoration: none; color: #444; font-weight: bold; font-size: 0.85rem; display: flex; align-items: center; gap: 8px; }
-        .nav-btn i { font-size: 1.1rem; color: var(--main); }
-
-        .container { padding: 15px; padding-bottom: 40px; }
-        .form-card { max-width: 850px; margin: auto; background: white; padding: 25px; border-radius: 15px; box-shadow: 0 5px 20px rgba(0,0,0,0.05); }
-        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-        .form-group { margin-bottom: 15px; }
-        label { display: block; font-weight: bold; margin-bottom: 5px; font-size: 0.9rem; color: #333; }
-        input, select, textarea { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 8px; box-sizing: border-box; font-size: 1rem; outline: none; }
-        
-        /* Previews and Image Management */
-        .preview-wrapper { position: relative; display: inline-block; margin-top: 10px; }
-        .preview-wrapper img { width: 120px; height: 160px; object-fit: contain; border: 2px solid var(--main); border-radius: 8px; }
-        
-        .gallery-preview { display: grid; grid-template-columns: repeat(auto-fill, minmax(85px, 1fr)); gap: 10px; margin-top: 12px; padding: 10px; border: 1px dashed #ccc; border-radius: 8px; }
-        .g-item { position: relative; width: 85px; height: 85px; border-radius: 5px; overflow: hidden; border: 1px solid #ddd; }
+        .admin-nav { background: white; padding: 12px 15px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.1); position: sticky; top: 0; z-index: 100; }
+        .container { padding: 15px; max-width: 850px; margin: auto; }
+        .form-card { background: white; padding: 20px; border-radius: 15px; box-shadow: 0 5px 20px rgba(0,0,0,0.1); }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px; }
+        @media (max-width: 600px) { .grid { grid-template-columns: 1fr; } }
+        label { font-weight: bold; font-size: 0.9rem; display: block; margin-bottom: 5px; }
+        input, select, textarea { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 8px; box-sizing: border-box; font-size: 16px; }
+        .preview-box { margin-top: 10px; width: 110px; height: 150px; border: 2px dashed #bbb; border-radius: 10px; display: flex; align-items: center; justify-content: center; position: relative; background: #fff; overflow: hidden; }
+        .preview-box img { max-width: 100%; max-height: 100%; object-fit: contain; }
+        .rem-btn { position: absolute; top: -5px; right: -5px; background: var(--danger); color: white; border: none; border-radius: 50%; width: 28px; height: 28px; cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: 10; }
+        .gallery-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); gap: 10px; margin-top: 10px; border: 1px dashed #ccc; padding: 10px; border-radius: 8px; }
+        .g-item { position: relative; height: 90px; border: 1px solid #ddd; border-radius: 5px; overflow: hidden; }
         .g-item img { width: 100%; height: 100%; object-fit: cover; }
-        
-        .remove-btn { 
-            position: absolute; top: 2px; right: 2px; background: var(--danger); 
-            color: white; border: none; border-radius: 50%; width: 22px; height: 22px; 
-            cursor: pointer; font-size: 10px; display: flex; align-items: center; justify-content: center; 
-            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-        }
-
-        .progress-box { width: 100%; background: #eee; height: 30px; border-radius: 8px; margin: 25px 0; display: none; overflow: hidden; }
-        .bar { width: 0%; height: 100%; background: #28a745; color: white; text-align: center; line-height: 30px; font-size: 12px; transition: 0.3s; font-weight: bold; }
-        
-        #saveBtn { width: 100%; padding: 16px; background: var(--main); color: white; border: none; border-radius: 10px; font-weight: bold; font-size: 1.1rem; cursor: pointer; }
-
-        @media (max-width: 600px) { .grid { grid-template-columns: 1fr; } .nav-text { display: none; } }
+        #pdfPrev { width: 100%; height: 200px; display: none; margin-top: 10px; border: 1px solid #ddd; border-radius: 8px; }
+        .prog-box { width: 100%; background: #eee; height: 35px; border-radius: 8px; margin: 20px 0; display: none; overflow: hidden; }
+        .bar { width: 0%; height: 100%; background: #28a745; color: white; text-align: center; line-height: 35px; font-weight: bold; transition: 0.3s; }
+        #saveBtn { width: 100%; padding: 18px; background: var(--main); color: white; border: none; border-radius: 10px; font-weight: bold; font-size: 1.1rem; cursor: pointer; margin-top: 20px; }
     </style>
 </head>
 <body>
-
 <header class="admin-nav">
-    <a href="manage-books.html" class="nav-btn"><i class="fas fa-arrow-left"></i> <span class="nav-text">Back to Manager</span></a>
-    <div style="display: flex; gap: 15px;">
-        <a href="admin-dashboard.html" class="nav-btn"><i class="fas fa-th-large"></i> <span class="nav-text">Dashboard</span></a>
-        <a href="../index.html" class="nav-btn"><i class="fas fa-external-link-alt"></i> <span class="nav-text">View Site</span></a>
-    </div>
+    <a href="manage-books.html" style="text-decoration:none; color:#444; font-weight:bold;"><i class="fas fa-arrow-left"></i> Back</a>
+    <h3 style="margin:0; color:var(--main);">Add New Book</h3>
 </header>
-
 <div class="container">
     <div class="form-card">
-        <h2 style="text-align: center; color: var(--main); margin: 0 0 20px;"><i class="fas fa-plus-circle"></i> Add New Book</h2>
-        
         <div class="grid">
-            <div class="form-group"><label>Book Title *</label><input type="text" id="title" required></div>
-            <div class="form-group"><label>Author/Editor *</label><input type="text" id="author" required></div>
+            <div><label>Book Title *</label><input type="text" id="title" required></div>
+            <div><label>Author *</label><input type="text" id="author" required></div>
         </div>
-
         <div class="grid">
-            <div class="form-group">
-                <label>Category</label>
-                <select id="category">
-                    <option value="General">General</option>
-                    <option value="Poetry">Poetry</option>
-                    <option value="Novel">Novel</option>
-                    <option value="Short Story">Short Story</option>
-                    <option value="Essay">Essay</option>
-                </select>
+            <div><label>Category</label><select id="cat"><option>General</option><option>Poetry</option><option>Novel</option><option>Essay</option></select></div>
+            <div><label>Language</label><input type="text" id="lang" value="Bengali"></div>
+        </div>
+        <div class="grid">
+            <div><label>Publication Date</label><input type="date" id="pubDate"></div>
+            <div><label>ISBN</label><input type="text" id="isbn"></div>
+        </div>
+        <div class="grid">
+            <div><label>Pages</label><input type="number" id="pages"></div>
+            <div><label>Price (৳)</label><input type="text" id="price"></div>
+        </div>
+        <div class="form-group"><label>Publisher</label><input type="text" id="pub"></div>
+        <div class="form-group" style="margin-top:10px;"><label>Description</label><textarea id="desc" rows="3"></textarea></div>
+        <hr style="margin:25px 0; border:0; border-top:1px solid #eee;">
+        <div class="grid">
+            <div>
+                <label>Cover Image *</label>
+                <input type="file" id="cIn" accept="image/*" onchange="preC(this)">
+                <div class="preview-box">
+                    <button class="rem-btn" id="rC" style="display:none" onclick="delC()">×</button>
+                    <img id="pC"><span id="pT" style="color:#999; font-size:0.8rem;">No Image</span>
+                </div>
             </div>
-            <div class="form-group"><label>Language</label><input type="text" id="language" placeholder="e.g. Bengali"></div>
-        </div>
-
-        <div class="grid">
-            <div class="form-group"><label>Publication Date</label><input type="date" id="pubDate"></div>
-            <div class="form-group"><label>ISBN</label><input type="text" id="isbn" placeholder="ISBN-13"></div>
-        </div>
-
-        <div class="grid">
-            <div class="form-group"><label>Number of Pages</label><input type="number" id="pages" placeholder="e.g. 150"></div>
-            <div class="form-group"><label>Price (৳)</label><input type="text" id="price" placeholder="e.g. 250"></div>
-        </div>
-
-        <div class="form-group"><label>Publisher</label><input type="text" id="publisher" placeholder="Publisher Name"></div>
-        <div class="form-group"><label>Description</label><textarea id="description" rows="3" placeholder="Write about the book..."></textarea></div>
-        <hr style="opacity:0.2;">
-        <h3>Media (Optional)</h3>
-        
-        <div class="grid">
-            <div class="form-group">
-                <label>Cover Image</label>
-                <input type="file" id="coverInput" accept="image/*" onchange="handleCover(this)">
-                <div id="coverPrevArea"></div>
-            </div>
-            <div class="form-group">
-                <label>PDF File</label>
-                <input type="file" id="pdfFile" accept=".pdf">
+            <div>
+                <label>PDF File <button onclick="delP()" id="pDelBtn" style="display:none; color:red; border:none; background:none; cursor:pointer;">(Clear)</button></label>
+                <input type="file" id="pIn" accept=".pdf" onchange="preP(this)"><iframe id="pdfPrev"></iframe>
             </div>
         </div>
-
-        <div class="form-group">
-            <label>Gallery Images (Up to 20)</label>
-            <input type="file" id="galleryInput" accept="image/*" multiple onchange="handleGallery(this)">
-            <div id="galleryPrevArea" class="gallery-preview"></div>
-        </div>
-
-        <div class="progress-box" id="pBox"><div class="bar" id="pBar">0%</div></div>
-        <button id="saveBtn">Save Book to Library</button>
+        <label style="margin-top:25px;">Gallery Photos (Add multiple)</label>
+        <input type="file" accept="image/*" onchange="appG(this)">
+        <div id="gArea" class="gallery-grid"></div>
+        <div class="prog-box" id="pB"><div class="bar" id="pBar">0%</div></div>
+        <button id="saveBtn">Upload and Add Book</button>
     </div>
 </div>
-
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getDatabase, ref, push } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+    import { getDatabase, ref, push, set } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+    const fb = initializeApp({ apiKey: "AIzaSyCftWFc6WvMbaY_iwF6DUawi7Qvf0SRKYc", databaseURL: "https://sahitya-mela-default-rtdb.firebaseio.com", projectId: "sahitya-mela" });
+    const db = getDatabase(fb);
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzdDsLPr7F-6gwkKzdJLNgCUZPIWIryVdKqrdnrtDX4DOK7hkLlhnXxcBjvEMH69d3r/exec";
 
-    const firebaseConfig = {
-        apiKey: "AIzaSyCftWFc6WvMbaY_iwF6DUawi7Qvf0SRKYc",
-        authDomain: "sahitya-mela.firebaseapp.com",
-        databaseURL: "https://sahitya-mela-default-rtdb.firebaseio.com",
-        projectId: "sahitya-mela",
-        storageBucket: "sahitya-mela.firebasestorage.app",
-        messagingSenderId: "283544938564",
-        appId: "1:283544938564:web:b9bba32cca9e52e6aab411"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const db = getDatabase(app);
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwXhWXp5ZoGl_WxK3See1T4QRttFEWMtqSkO5zNq2ojxgB0JGAOTmgn8zPthJ1AXvGB/exec";
-
-    let selectedCover = null;
-    let selectedGallery = [];
-
-    window.handleCover = (input) => {
-        if (input.files[0]) {
-            selectedCover = input.files[0];
-            const area = document.getElementById('coverPrevArea');
-            area.innerHTML = `
-                <div class="preview-wrapper">
-                    <img src="${URL.createObjectURL(selectedCover)}">
-                    <button class="remove-btn" onclick="removeCover()">X</button>
-                </div>`;
-        }
-    };
-
-    window.removeCover = () => {
-        selectedCover = null;
-        document.getElementById('coverInput').value = "";
-        document.getElementById('coverPrevArea').innerHTML = "";
-    };
-
-    window.handleGallery = (input) => {
-        const files = Array.from(input.files);
-        selectedGallery = [...selectedGallery, ...files].slice(0, 20);
-        renderGallery();
-    };
-
-    function renderGallery() {
-        const area = document.getElementById('galleryPrevArea');
-        area.innerHTML = "";
-        selectedGallery.forEach((file, index) => {
-            const div = document.createElement('div');
-            div.className = 'g-item';
-            div.innerHTML = `
-                <img src="${URL.createObjectURL(file)}">
-                <button class="remove-btn" onclick="removeGImg(${index})">X</button>`;
-            area.appendChild(div);
-        });
-    }
-
-    window.removeGImg = (index) => {
-        selectedGallery.splice(index, 1);
-        renderGallery();
-    };
+    let galFiles = [];
+    window.preC = (i) => { if(i.files[0]) { document.getElementById('pC').src = URL.createObjectURL(i.files[0]); document.getElementById('rC').style.display='flex'; document.getElementById('pT').style.display='none'; }};
+    window.delC = () => { document.getElementById('cIn').value=""; document.getElementById('pC').src=""; document.getElementById('rC').style.display='none'; document.getElementById('pT').style.display='block'; };
+    window.preP = (i) => { if(i.files[0]) { document.getElementById('pdfPrev').src = URL.createObjectURL(i.files[0]); document.getElementById('pdfPrev').style.display='block'; document.getElementById('pDelBtn').style.display='inline'; }};
+    window.delP = () => { document.getElementById('pIn').value=""; document.getElementById('pdfPrev').src=""; document.getElementById('pdfPrev').style.display='none'; document.getElementById('pDelBtn').style.display='none'; };
+    window.appG = (i) => { if(i.files[0]) { galFiles.push(i.files[0]); renderG(); i.value=""; }};
+    window.remG = (idx) => { galFiles.splice(idx, 1); renderG(); };
+    function renderG() { const a = document.getElementById('gArea'); a.innerHTML=""; galFiles.forEach((f, i) => { a.innerHTML += `<div class="g-item"><img src="${URL.createObjectURL(f)}"><button class="rem-btn" onclick="remG(${i})">×</button></div>`; }); }
 
     async function upload(file) {
-        return new Promise((resolve) => {
+        return new Promise((res) => {
             const r = new FileReader();
-            r.onload = async () => {
-                const base64 = r.result.split(',')[1];
-                const res = await fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ base64, type: file.type, name: file.name }) });
-                const d = await res.json();
-                resolve(d.id);
-            };
             r.readAsDataURL(file);
+            r.onload = async () => {
+                const rep = await fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ base64: r.result.split(',')[1], type: file.type, name: file.name }) });
+                const d = await rep.json(); res(d.id);
+            };
         });
-    }
-
-    function updateProg(pct, msg) {
-        const pBox = document.getElementById('pBox');
-        const pBar = document.getElementById('pBar');
-        pBox.style.display = 'block';
-        pBar.style.width = pct + "%";
-        pBar.innerText = `${msg} (${pct}%)`;
     }
 
     document.getElementById('saveBtn').onclick = async () => {
-        const btn = document.getElementById('saveBtn');
-        const pFile = document.getElementById('pdfFile').files[0];
-        
-        if(!document.getElementById('title').value || !document.getElementById('author').value) {
-            alert("Title and Author are required!"); return;
-        }
-
-        btn.disabled = true;
-
-        let bookData = {
-            title: document.getElementById('title').value,
-            author: document.getElementById('author').value,
-            category: document.getElementById('category').value,
-            language: document.getElementById('language').value,
-            pubDate: document.getElementById('pubDate').value,
-            isbn: document.getElementById('isbn').value,
-            pages: document.getElementById('pages').value,
-            price: document.getElementById('price').value,
-            publisher: document.getElementById('publisher').value,
-            description: document.getElementById('description').value,
-            coverUrl: "../assets/images/logo.png",
-            pdfUrl: "",
-            gallery: []
-        };
-
+        const title = document.getElementById('title').value;
+        const cF = document.getElementById('cIn').files[0];
+        if(!title || !cF) return alert("Title and Cover required");
+        document.getElementById('saveBtn').disabled = true;
+        document.getElementById('pB').style.display='block';
+        const bar = document.getElementById('pBar');
         try {
-            if(selectedCover) {
-                updateProg(15, "Uploading Cover...");
-                const id = await upload(selectedCover);
-                bookData.coverUrl = `https://lh3.googleusercontent.com/d/${id}`;
+            bar.style.width="20%"; bar.innerText="Cover...";
+            const cid = await upload(cF);
+            let book = { title, author: document.getElementById('author').value, category: document.getElementById('cat').value, language: document.getElementById('lang').value, pubDate: document.getElementById('pubDate').value, isbn: document.getElementById('isbn').value, pages: document.getElementById('pages').value, price: document.getElementById('price').value, publisher: document.getElementById('pub').value, description: document.getElementById('desc').value, coverUrl: cid, gallery: [] };
+            const pF = document.getElementById('pIn').files[0];
+            if(pF) { bar.style.width="50%"; bar.innerText="PDF..."; book.pdfUrl = "https://drive.google.com/file/d/"+(await upload(pF))+"/preview"; }
+            for(let i=0; i<galFiles.length; i++) {
+                bar.style.width = (60+i) + "%"; bar.innerText = "Photo "+(i+1);
+                book.gallery.push(await upload(galFiles[i]));
             }
-            if(pFile) {
-                updateProg(40, "Uploading PDF...");
-                const id = await upload(pFile);
-                bookData.pdfUrl = `https://drive.google.com/file/d/${id}/preview`;
-            }
-            if(selectedGallery.length > 0) {
-                for(let i=0; i<selectedGallery.length; i++) {
-                    const step = Math.floor(50 + ((i+1)/selectedGallery.length * 40));
-                    updateProg(step, `Gallery Photo ${i+1}/${selectedGallery.length}...`);
-                    const id = await upload(selectedGallery[i]);
-                    bookData.gallery.push(`https://lh3.googleusercontent.com/d/${id}`);
-                }
-            }
-
-            updateProg(95, "Saving...");
-            await push(ref(db, 'books'), bookData);
-            updateProg(100, "Success!");
-            alert("✅ Book Added Successfully!");
-            location.href = "manage-books.html";
-        } catch(e) { alert("Error! Check Console."); console.error(e); btn.disabled = false; }
+            await set(push(ref(db, 'books')), book);
+            alert("✅ Added Successfully!"); location.reload();
+        } catch(e) { alert("Error! Check script and rules."); document.getElementById('saveBtn').disabled = false; }
     };
 </script>
 </body>
