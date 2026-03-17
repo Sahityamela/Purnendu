@@ -47,7 +47,6 @@
         .hamburger { display: none; font-size: 1.5rem; cursor: pointer; color: var(--main); }
 
         /* --- HERO SECTION --- */
-        /* --- HERO CORE STYLES --- */
         .hero {
             position: relative;
             height: 100vh;
@@ -60,7 +59,6 @@
             overflow: hidden;
         }
 
-        /* --- THE BEST ANIMATION: Ken Burns Background --- */
         .hero-bg {
             position: absolute;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -81,12 +79,9 @@
             z-index: -1;
         }
 
-        /* --- CONTENT STYLES --- */
         .hero-content { z-index: 10; padding: 20px; }
-
         .highlight { color: #f1c40f; text-shadow: 0 0 10px rgba(241, 196, 15, 0.3); }
 
-        /* --- GLASS CLOCK ANIMATION --- */
         .glass-clock {
             background: rgba(255, 255, 255, 0.1);
             backdrop-filter: blur(10px);
@@ -101,7 +96,6 @@
         #heroTime { font-size: 1.8rem; font-weight: bold; color: #f1c40f; }
         #heroDate { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 2px; }
 
-        /* --- TEXT REVEAL ANIMATIONS --- */
         .reveal-text {
             font-size: 4rem;
             font-family: 'Playfair Display', serif;
@@ -114,7 +108,6 @@
         .fade-in-delay { opacity: 0; animation: fadeInUp 1s forwards 0.5s; font-size: 1.5rem; color: #f1c40f; }
         .sub-text { display: block; margin: 15px 0 30px; font-style: italic; opacity: 0; animation: fadeInUp 1s forwards 0.8s; }
 
-        /* --- BUTTON ANIMATION --- */
         .main-btn {
             padding: 15px 40px;
             background: #8B0000;
@@ -134,7 +127,6 @@
             box-shadow: 0 0 20px rgba(255,255,255,0.2);
         }
 
-        /* --- KEYFRAMES --- */
         @keyframes fadeInUp {
             to { opacity: 1; transform: translateY(0); }
         }
@@ -145,33 +137,15 @@
         
         .books-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 30px; justify-items: center; }
         
-        /* --- MOBILE TOUCH OPTIMIZATION --- */
         .book-card {
-            cursor: pointer;
-            position: relative;
-            -webkit-tap-highlight-color: transparent;
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-        }
-        
-        .book-card:active {
-            transform: scale(0.98);
-            background-color: #f0f0f0;
-        }
-        
-        .book-card a {
-            pointer-events: none;
-        }
-        
-        .read-btn {
-            pointer-events: none;
-        }
-        
-        .book-card { 
             background: white; border-radius: 15px; overflow: hidden; 
             box-shadow: 0 10px 20px rgba(0,0,0,0.05); width: 100%; max-width: 320px;
             transition: 0.3s; cursor: pointer; border: 1px solid #eee; text-align: center;
+            -webkit-tap-highlight-color: transparent;
         }
         .book-card:hover { transform: translateY(-10px); box-shadow: 0 15px 30px rgba(0,0,0,0.1); }
+        .book-card:active { transform: scale(0.98); background-color: #f0f0f0; }
+        
         .book-cover-box { width: 100%; height: 280px; background: #fafafa; display: flex; align-items: center; justify-content: center; padding: 15px; box-sizing: border-box; }
         .book-card img { max-width: 100%; max-height: 100%; object-fit: contain; }
         .book-details { padding: 20px; }
@@ -196,10 +170,9 @@
         .fb-icon:hover { transform: scale(1.1); background: #f00; }
         .footer-bottom { text-align: center; margin-top: 50px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.1); color: #bdc3c7; font-size: 0.9rem; }
 
-        /* Mobile Adjustments */
         @media (max-width: 768px) {
             .reveal-text { font-size: 2.5rem; }
-            .hero-bg { animation: none; } /* Disable zoom on mobile for performance */
+            .hero-bg { animation: none; }
             .hamburger { display: block; }
             .nav-menu {
                 display: none; flex-direction: column; position: absolute;
@@ -236,18 +209,15 @@
     <section class="hero">
         <div class="hero-bg"></div>
         <div class="hero-overlay"></div>
-
         <div class="hero-content">
-            <div class="glass-clock fade-in-up">
-                <div id="heroDate">Saturday, March 14, 2026</div>
-                <div id="heroTime">11:30:26 PM</div>
+            <div class="glass-clock">
+                <div id="heroDate">...</div>
+                <div id="heroTime">...</div>
             </div>
-
             <h1 class="reveal-text">Welcome to <span class="highlight">SAHITYA MELA</span></h1>
             <p class="fade-in-delay">50 Years of Literary Tradition</p>
-            <span class="sub-text fade-in-delay-2">Our literary journey with poetry and stories</span>
-            
-            <div class="hero-btns fade-in-delay-3">
+            <span class="sub-text">Our literary journey with poetry and stories</span>
+            <div class="hero-btns">
                 <a href="library.html" class="main-btn">Visit Library</a>
             </div>
         </div>
@@ -265,7 +235,6 @@
                 <h2>SAHITYA MELA</h2>
                 <p style="color: #bdc3c7; margin-top:10px;">50 Years of Literary Excellence</p>
             </div>
-
             <div>
                 <h4>Quick Links</h4>
                 <ul>
@@ -275,7 +244,6 @@
                     <li><a href="contact.html">Contact</a></li>
                 </ul>
             </div>
-
             <div>
                 <h4>Literature</h4>
                 <ul>
@@ -285,25 +253,14 @@
                     <li><a href="#">Publications</a></li>
                 </ul>
             </div>
-
             <div>
                 <h4>Contact Us</h4>
-                <div class="contact-item">
-                    <i class="fas fa-envelope" style="color:var(--main)"></i>
-                    <span>sahityamela64@gmail.com</span>
-                </div>
-                <div class="contact-item">
-                    <i class="fas fa-phone" style="color:var(--main)"></i>
-                    <span>8240531141</span>
-                </div>
-                <a href="https://www.facebook.com/share/18Wdg7Qvm7/" target="_blank" class="fb-icon">
-                    <i class="fab fa-facebook-f"></i>
-                </a>
+                <div class="contact-item"><i class="fas fa-envelope" style="color:var(--main)"></i><span>sahityamela64@gmail.com</span></div>
+                <div class="contact-item"><i class="fas fa-phone" style="color:var(--main)"></i><span>8240531141</span></div>
+                <a href="https://www.facebook.com/share/18Wdg7Qvm7/" target="_blank" class="fb-icon"><i class="fab fa-facebook-f"></i></a>
             </div>
         </div>
-        <div class="footer-bottom">
-            (All rights reserved by SAHITYA MELA)
-        </div>
+        <div class="footer-bottom">(All rights reserved by SAHITYA MELA)</div>
     </footer>
 
     <script type="module">
@@ -323,61 +280,63 @@
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
 
-        // Mobile Menu Logic
         const menuToggle = document.getElementById('menuToggle');
         const navMenu = document.getElementById('navMenu');
         menuToggle.onclick = () => navMenu.classList.toggle('active');
 
-        // Secure Image Repair
+        // FIX: Reliable Image Link Generator
         function fixUrl(url) {
-            if (!url) return "assets/images/logo.png";
-            let id = "";
-            if (url.includes('id=')) id = url.split('id=')[1].split('&')[0];
-            else if (url.includes('{')) id = url.split('{')[1].split('}')[0];
-            else if (url.includes('/d/')) id = url.split('/d/')[1].split('/')[0];
-            return id ? `https://lh3.googleusercontent.com/d/${id}` : url;
+            if (!url || url === "" || url.includes('assets/images')) return "assets/images/logo.png";
+            let fileId = "";
+            try {
+                if (url.includes('id=')) fileId = url.split('id=')[1].split('&')[0];
+                else if (url.includes('/d/')) fileId = url.split('/d/')[1].split('/')[0];
+                else fileId = url;
+                fileId = fileId.toString().replace(/[{}]/g, '').trim();
+                return `https://drive.google.com/thumbnail?id=${fileId}&sz=w500`;
+            } catch (e) { return "assets/images/logo.png"; }
         }
 
-        // --- LIVE CLOCK LOGIC ---
         function updateHeroClock() {
             const now = new Date();
             const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-            document.getElementById('heroDate').innerText = now.toLocaleDateString('en-US', options);
-            document.getElementById('heroTime').innerText = now.toLocaleTimeString('en-US', { hour12: true });
+            if(document.getElementById('heroDate')) document.getElementById('heroDate').innerText = now.toLocaleDateString('en-US', options);
+            if(document.getElementById('heroTime')) document.getElementById('heroTime').innerText = now.toLocaleTimeString('en-US', { hour12: true });
         }
         setInterval(updateHeroClock, 1000);
         updateHeroClock();
 
-        // Load Featured Books
         const latestQuery = query(ref(db, 'books'), limitToLast(3));
         onValue(latestQuery, (snapshot) => {
             const grid = document.getElementById('featuredBooks');
             grid.innerHTML = '';
-            if (snapshot.exists()) {
-                snapshot.forEach((child) => {
-                    const book = child.val();
-                    const id = child.key;
-                    
-                    // Create the card element
-                    const card = document.createElement('div');
-                    card.className = 'book-card';
-                    
-                    // MAKE FULL CARD TOUCHABLE
-                    card.onclick = () => {
-                        window.location.href = `book-reader.html?id=${id}`;
-                    };
-                    
-                    card.innerHTML = `
-                        <div class="book-cover-box"><img src="${fixUrl(book.coverUrl)}" onerror="this.src='assets/images/logo.png'"></div>
-                        <div class="book-details">
-                            <h3 style="margin:0; font-size:1.1rem;">${book.title}</h3>
-                            <p style="margin:5px 0; color:#666; font-size:0.9rem;">By ${book.author}</p>
-                            <span class="read-btn">Explore Book</span>
-                        </div>
-                    `;
-                    grid.appendChild(card);
-                });
-            }
+            try {
+                if (snapshot.exists()) {
+                    const data = snapshot.val();
+                    Object.keys(data).reverse().forEach((bookId) => {
+                        const book = data[bookId];
+                        const card = document.createElement('div');
+                        card.className = 'book-card';
+                        card.onclick = () => { window.location.href = `book-reader.html?id=${bookId}`; };
+                        
+                        // FIXED: Re-added the unique coverUrl inside the loop
+                        card.innerHTML = `
+                            <div class="book-cover-box">
+                                <img src="${fixUrl(book.coverUrl)}" onerror="this.src='assets/images/logo.png'">
+                            </div>
+                            <div class="book-details">
+                                <h3 style="margin:0; font-size:1.1rem;">${book.title || 'Untitled'}</h3>
+                                <p style="margin:5px 0; color:#666; font-size:0.9rem;">By ${book.author || 'Unknown'}</p>
+                                <span class="read-btn">Explore Book</span>
+                            </div>
+                        `;
+                        grid.appendChild(card);
+                    });
+                } else { grid.innerHTML = '<p>No books added yet.</p>'; }
+            } catch (err) { console.error("UI error:", err); }
+            finally { document.getElementById('loader-wrapper').style.display = 'none'; }
+        }, (error) => {
+            console.error("Firebase error:", error);
             document.getElementById('loader-wrapper').style.display = 'none';
         });
     </script>
