@@ -8,208 +8,245 @@
     <style>
         :root { --main: #8B0000; --bg: #f4f4f4; --danger: #dc3545; }
         body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; padding: 0; }
-        .admin-nav { background: white; padding: 10px 15px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.1); position: sticky; top: 0; z-index: 1000; }
-        .nav-btn { text-decoration: none; color: #444; font-weight: bold; font-size: 0.85rem; display: flex; align-items: center; gap: 8px; }
-        .nav-btn i { font-size: 1.1rem; color: var(--main); }
-        .container { padding: 15px; padding-bottom: 40px; }
-        .form-card { max-width: 800px; margin: auto; background: white; padding: 25px; border-radius: 15px; box-shadow: 0 5px 20px rgba(0,0,0,0.05); }
-        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-        .form-group { margin-bottom: 18px; }
-        label { display: block; font-weight: bold; margin-bottom: 6px; font-size: 0.9rem; color: #333; }
-        input, select, textarea { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 8px; box-sizing: border-box; font-size: 1rem; outline: none; }
-        .preview-wrapper { position: relative; display: inline-block; margin-top: 10px; }
-        .preview-wrapper img { width: 90px; height: 120px; object-fit: contain; border: 2px solid var(--main); border-radius: 8px; background: #f9f9f9; }
-        .gallery-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); gap: 10px; margin-top: 10px; padding: 10px; border: 1px dashed #ccc; border-radius: 8px; }
-        .g-item { position: relative; width: 80px; height: 80px; border-radius: 5px; overflow: hidden; border: 1px solid #ddd; }
+        
+        .admin-nav { background: white; padding: 12px 15px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.1); position: sticky; top: 0; z-index: 100; }
+        .container { padding: 15px; max-width: 900px; margin: auto; }
+        .form-card { background: white; padding: 20px; border-radius: 15px; box-shadow: 0 5px 20px rgba(0,0,0,0.05); }
+
+        /* Responsive Grid: 1 column on mobile, 2 on desktop */
+        .grid { display: grid; grid-template-columns: 1fr; gap: 15px; margin-bottom: 15px; }
+        @media (min-width: 650px) { .grid { grid-template-columns: 1fr 1fr; } }
+
+        label { display: block; font-weight: bold; margin-bottom: 6px; font-size: 0.9rem; color: #444; }
+        input, select, textarea { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 8px; box-sizing: border-box; font-size: 16px; }
+
+        /* Media Previews */
+        .preview-box { width: 120px; height: 160px; border: 2px solid var(--main); border-radius: 10px; margin-top: 10px; background: #fff; overflow: hidden; position: relative; }
+        .preview-box img { width: 100%; height: 100%; object-fit: contain; }
+
+        .pdf-preview { width: 100%; height: 300px; border: 1px solid #ddd; border-radius: 10px; margin-top: 10px; }
+
+        /* Gallery System */
+        .gallery-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(90px, 1fr)); gap: 12px; margin-top: 10px; border: 1px dashed #ccc; padding: 10px; border-radius: 10px; }
+        .g-item { position: relative; height: 90px; border-radius: 8px; overflow: hidden; border: 1px solid #ddd; background: #eee; }
         .g-item img { width: 100%; height: 100%; object-fit: cover; }
-        .remove-btn { position: absolute; top: 2px; right: 2px; background: var(--danger); color: white; border: none; border-radius: 50%; width: 22px; height: 22px; cursor: pointer; font-size: 10px; display: flex; align-items: center; justify-content: center; }
-        .progress-box { width: 100%; background: #eee; height: 35px; border-radius: 8px; margin: 25px 0; display: none; overflow: hidden; position: relative; }
-        .bar { width: 0%; height: 100%; background: #28a745; color: white; text-align: center; line-height: 35px; font-size: 13px; transition: 0.3s; font-weight: bold; }
-        #saveBtn { width: 100%; padding: 16px; background: var(--main); color: white; border: none; border-radius: 10px; font-weight: bold; font-size: 1.1rem; cursor: pointer; }
-        .pdf-preview { width: 100%; height: 200px; border: 1px solid #ddd; border-radius: 8px; margin-top: 10px; display: none; }
+
+        /* RED X BUTTON */
+        .remove-btn { position: absolute; top: 4px; right: 4px; background: var(--danger); color: white; border: none; border-radius: 50%; width: 26px; height: 26px; cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: 10; box-shadow: 0 2px 4px rgba(0,0,0,0.3); font-size: 12px; }
+
+        #saveBtn { width: 100%; padding: 18px; background: var(--main); color: white; border: none; border-radius: 12px; font-weight: bold; font-size: 1.1rem; cursor: pointer; margin-top: 25px; transition: 0.3s; }
+        #saveBtn:disabled { background: #ccc; cursor: not-allowed; }
     </style>
 </head>
 <body>
 
 <header class="admin-nav">
-    <a href="manage-books.html" class="nav-btn"><i class="fas fa-arrow-left"></i> <span class="nav-text">Back</span></a>
-    <div style="display: flex; gap: 15px;">
-        <a href="dashboard.html" class="nav-btn"><i class="fas fa-th-large"></i> <span class="nav-text">Dashboard</span></a>
-    </div>
+    <a href="manage-books.html" style="text-decoration:none; color:#444; font-weight:bold;"><i class="fas fa-arrow-left"></i> Back</a>
+    <h3 style="margin:0; color:var(--main); font-size:1.1rem;">Sahitya Mela - Edit Book</h3>
 </header>
 
 <div class="container">
     <div class="form-card">
-        <h2 style="text-align: center; color: var(--main); margin-bottom: 20px;">Edit Book Details</h2>
-        
-        <div class="grid">
-            <div class="form-group"><label>Book Title *</label><input type="text" id="title" required></div>
-            <div class="form-group"><label>Author/Editor *</label><input type="text" id="author" required></div>
+        <div id="loader" style="text-align:center; padding:40px;">
+            <i class="fas fa-spinner fa-spin" style="font-size:2rem; color:var(--main);"></i><br><br>Loading book data...
         </div>
-        <div class="grid">
-            <div class="form-group"><label>Category</label><select id="category"><option value="General">General</option><option value="Poetry">Poetry</option><option value="Novel">Novel</option><option value="Short Story">Short Story</option><option value="Essay">Essay</option></select></div>
-            <div class="form-group"><label>Language</label><input type="text" id="language"></div>
-        </div>
-        <div class="grid">
-            <div class="form-group"><label>Publication Date</label><input type="date" id="pubDate"></div>
-            <div class="form-group"><label>ISBN</label><input type="text" id="isbn"></div>
-        </div>
-        <div class="grid">
-            <div class="form-group"><label>Pages</label><input type="number" id="pages"></div>
-            <div class="form-group"><label>Price (৳)</label><input type="text" id="price"></div>
-        </div>
-        <div class="form-group"><label>Publisher</label><input type="text" id="publisher"></div>
-        <div class="form-group"><label>Description</label><textarea id="description" rows="3"></textarea></div>
 
-        <hr>
-        <h3>Media Updates</h3>
-        <div class="grid">
-            <div class="form-group">
-                <label>Cover Image</label>
-                <input type="file" id="coverInput" accept="image/*" onchange="handleNewCover(this)">
-                <div class="preview-wrapper"><img id="mainPrev" src=""></div>
+        <div id="editForm" style="display:none;">
+            <div class="grid">
+                <div><label>Book Title *</label><input type="text" id="title" required></div>
+                <div><label>Author/Editor *</label><input type="text" id="author" required></div>
             </div>
-            <div class="form-group">
-                <label>PDF File</label>
-                <div style="display: flex; gap: 5px;">
-                    <input type="file" id="pdfFile" accept=".pdf">
-                    <button id="delPdfBtn" style="background:var(--danger); color:white; border:none; padding:10px; border-radius:8px; cursor:pointer; display:none;">Delete</button>
+
+            <div class="grid">
+                <div>
+                    <label>Category</label>
+                    <select id="category">
+                        <option value="General">General</option>
+                        <option value="Poetry">Poetry</option>
+                        <option value="Novel">Novel</option>
+                        <option value="Essay">Essay</option>
+                        <option value="Short Story">Short Story</option>
+                    </select>
                 </div>
-                <iframe id="pdfPrev" class="pdf-preview"></iframe>
+                <div><label>Language</label><input type="text" id="language"></div>
             </div>
-        </div>
 
-        <div class="form-group">
-            <label>Gallery</label>
-            <div id="galleryManager" class="gallery-container"></div>
-            <label style="margin-top:10px;">Add New Photos</label>
-            <input type="file" id="galleryInput" multiple accept="image/*" onchange="handleNewGallery(this)">
-            <div id="newGPreview" class="gallery-container"></div>
-        </div>
+            <div class="grid">
+                <div><label>Publication Date</label><input type="date" id="pubDate"></div>
+                <div><label>ISBN Number</label><input type="text" id="isbn"></div>
+            </div>
 
-        <div class="progress-box" id="pBox"><div class="bar" id="pBar">0%</div></div>
-        <button id="saveBtn">Save All Changes</button>
+            <div class="grid">
+                <div><label>Number of Pages</label><input type="number" id="pages"></div>
+                <div><label>Price (৳)</label><input type="text" id="price"></div>
+            </div>
+
+            <div class="grid">
+                <div><label>Publisher</label><input type="text" id="publisher"></div>
+                <div></div>
+            </div>
+
+            <label>Description / Summary</label>
+            <textarea id="description" rows="4"></textarea>
+
+            <hr style="margin:25px 0; border:0; border-top:1px solid #eee;">
+
+            <div class="grid">
+                <div>
+                    <label>Update Cover</label>
+                    <input type="file" id="coverIn" accept="image/*" onchange="preCov(this)">
+                    <div class="preview-box"><img id="pCovImg" src=""></div>
+                </div>
+                <div>
+                    <label>Current PDF <button onclick="delPdf()" style="color:red; background:none; border:none; cursor:pointer; font-weight:bold; padding:0 5px;">(Delete Current)</button></label>
+                    <input type="file" id="pdfIn" accept=".pdf" onchange="prePdf(this)">
+                    <iframe id="pPdfFrame" class="pdf-preview" style="display:none;"></iframe>
+                </div>
+            </div>
+
+            <label style="margin-top:25px; display:block; font-weight:bold;">Existing Gallery (Click X to delete from Drive)</label>
+            <div id="gArea" class="gallery-grid"></div>
+
+            <label style="margin-top:20px; display:block; color:green; font-weight:bold;">+ Add New Photos to Gallery</label>
+            <input type="file" multiple accept="image/*" onchange="addMorePhotos(this)">
+            <div id="newGArea" class="gallery-grid"></div>
+
+            <button id="saveBtn">Save All Changes</button>
+        </div>
     </div>
 </div>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getDatabase, ref, get, update } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
-    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
-    const firebaseConfig = {
-        apiKey: "AIzaSyCftWFc6WvMbaY_iwF6DUawi7Qvf0SRKYc",
-        authDomain: "sahitya-mela.firebaseapp.com",
-        databaseURL: "https://sahitya-mela-default-rtdb.firebaseio.com",
-        projectId: "sahitya-mela",
-        storageBucket: "sahitya-mela.firebasestorage.app",
-        messagingSenderId: "283544938564",
-        appId: "1:283544938564:web:b9bba32cca9e52e6aab411"
+    const fbConfig = { 
+        apiKey: "AIzaSyCftWFc6WvMbaY_iwF6DUawi7Qvf0SRKYc", 
+        databaseURL: "https://sahitya-mela-default-rtdb.firebaseio.com", 
+        projectId: "sahitya-mela" 
     };
-
-    const app = initializeApp(firebaseConfig);
-    const db = getDatabase(app);
-    const auth = getAuth(app);
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwXhWXp5ZoGl_WxK3See1T4QRttFEWMtqSkO5zNq2ojxgB0JGAOTmgn8zPthJ1AXvGB/exec";
+    const db = getDatabase(initializeApp(fbConfig));
+    
+    // Deployment URL from your Google Apps Script
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzdDsLPr7F-6gwkKzdJLNgCUZPIWIryVdKqrdnrtDX4DOK7hkLlhnXxcBjvEMH69d3r/exec";
 
     const bookId = new URLSearchParams(window.location.search).get('id');
     const bookRef = ref(db, 'books/' + bookId);
 
-    window.existingGallery = [];
-    let currentPdfUrl = null;
-    let newCoverFile = null;
-    let newGalleryFiles = [];
+    // Initializing state
+    let currentGallery = [];
+    let newPhotoFiles = [];
+    let currentCoverUrl = "";
+    let currentPdfUrl = "";
 
-    onAuthStateChanged(auth, (user) => { if (!user) window.location.href = "login.html"; });
+    function fix(u) {
+        if (!u || u === "" || u.includes('logo')) return "../assets/images/logo.png";
+        let id = u;
+        if (u.includes('id=')) id = u.split('id=')[1].split('&')[0];
+        else if (u.includes('/d/')) id = u.split('/d/')[1].split('/')[0];
+        id = id.toString().replace(/[{}]/g, '').trim();
+        return `https://lh3.googleusercontent.com/d/${id}`;
+    }
 
-    get(bookRef).then((s) => {
-        if (s.exists()) {
-            const d = s.val();
-            document.getElementById('title').value = d.title || "";
-            document.getElementById('author').value = d.author || "";
-            document.getElementById('category').value = d.category || "General";
-            document.getElementById('language').value = d.language || "";
-            document.getElementById('pubDate').value = d.pubDate || "";
-            document.getElementById('isbn').value = d.isbn || "";
-            document.getElementById('pages').value = d.pages || "";
-            document.getElementById('price').value = d.price || "";
-            document.getElementById('publisher').value = d.publisher || "";
-            document.getElementById('description').value = d.description || "";
-            document.getElementById('mainPrev').src = d.coverUrl || "";
+    // Load Existing Data
+    get(bookRef).then(snapshot => {
+        if (snapshot.exists()) {
+            const data = snapshot.val();
+            document.getElementById('title').value = data.title || "";
+            document.getElementById('author').value = data.author || "";
+            document.getElementById('category').value = data.category || "General";
+            document.getElementById('language').value = data.language || "";
+            document.getElementById('pubDate').value = data.pubDate || "";
+            document.getElementById('isbn').value = data.isbn || "";
+            document.getElementById('pages').value = data.pages || "";
+            document.getElementById('price').value = data.price || "";
+            document.getElementById('publisher').value = data.publisher || "";
+            document.getElementById('description').value = data.description || "";
             
-            if(d.pdfUrl) {
-                currentPdfUrl = d.pdfUrl;
-                document.getElementById('pdfPrev').src = d.pdfUrl;
-                document.getElementById('pdfPrev').style.display = 'block';
-                document.getElementById('delPdfBtn').style.display = 'block';
+            currentCoverUrl = data.coverUrl || "";
+            document.getElementById('pCovImg').src = fix(currentCoverUrl);
+
+            currentPdfUrl = data.pdfUrl || "";
+            if (currentPdfUrl) {
+                document.getElementById('pPdfFrame').src = currentPdfUrl;
+                document.getElementById('pPdfFrame').style.display = "block";
             }
-            window.existingGallery = d.gallery || [];
-            renderExistingGallery();
+
+            currentGallery = data.gallery || [];
+            renderOldGallery();
+
+            document.getElementById('loader').style.display = "none";
+            document.getElementById('editForm').style.display = "block";
         }
     });
 
-    function renderExistingGallery() {
-        const container = document.getElementById('galleryManager');
-        container.innerHTML = "";
-        window.existingGallery.forEach((url, i) => {
-            const div = document.createElement('div');
-            div.className = 'g-item';
-            div.innerHTML = `<img src="${url}"><button class="remove-btn" onclick="removeOldImg(${i})">X</button>`;
-            container.appendChild(div);
+    // Gallery Render Logic
+    function renderOldGallery() {
+        const area = document.getElementById('gArea');
+        area.innerHTML = "";
+        currentGallery.forEach((url, i) => {
+            area.innerHTML += `
+                <div class="g-item">
+                    <img src="${fix(url)}">
+                    <button class="remove-btn" onclick="removeOld(${i})">×</button>
+                </div>`;
         });
     }
 
-    window.removeOldImg = (i) => { window.existingGallery.splice(i, 1); renderExistingGallery(); };
-    window.handleNewCover = (input) => { if (input.files[0]) { newCoverFile = input.files[0]; document.getElementById('mainPrev').src = URL.createObjectURL(newCoverFile); } };
-
-    document.getElementById('delPdfBtn').onclick = () => {
-        if(confirm("Delete PDF from this book?")) {
-            currentPdfUrl = null;
-            document.getElementById('pdfPrev').style.display = 'none';
-            document.getElementById('delPdfBtn').style.display = 'none';
+    window.removeOld = (i) => {
+        if (confirm("Delete this photo? This cannot be undone after saving.")) {
+            currentGallery.splice(i, 1);
+            renderOldGallery();
         }
     };
 
-    window.handleNewGallery = (input) => {
-        newGalleryFiles = Array.from(input.files);
-        const container = document.getElementById('newGPreview');
-        container.innerHTML = "";
-        newGalleryFiles.forEach((file, i) => {
-            const div = document.createElement('div');
-            div.className = 'g-item';
-            div.innerHTML = `<img src="${URL.createObjectURL(file)}">`;
-            container.appendChild(div);
-        });
+    window.addMorePhotos = (input) => {
+        if (input.files) {
+            Array.from(input.files).forEach(file => newPhotoFiles.push(file));
+            renderNewGallery();
+        }
     };
 
-    async function upload(file) {
-        return new Promise((resolve, reject) => {
-            const r = new FileReader();
-            r.onload = async () => {
-                const base64 = r.result.split(',')[1];
-                try {
-                    const res = await fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ base64, type: file.type, name: file.name }) });
-                    const d = await res.json();
-                    if(d.id) resolve(d.id); else reject("Drive Error");
-                } catch (e) { reject(e); }
-            };
-            r.readAsDataURL(file);
+    function renderNewGallery() {
+        const area = document.getElementById('newGArea');
+        area.innerHTML = "";
+        newPhotoFiles.forEach((file, i) => {
+            area.innerHTML += `
+                <div class="g-item">
+                    <img src="${URL.createObjectURL(file)}">
+                    <button class="remove-btn" onclick="removeNew(${i})">×</button>
+                </div>`;
         });
     }
 
-    function updateProg(pct, msg) {
-        document.getElementById('pBox').style.display = 'block';
-        document.getElementById('pBar').style.width = pct + "%";
-        document.getElementById('pBar').innerText = msg;
+    window.removeNew = (i) => {
+        newPhotoFiles.splice(i, 1);
+        renderNewGallery();
+    };
+
+    window.preCov = (i) => { if(i.files[0]) document.getElementById('pCovImg').src = URL.createObjectURL(i.files[0]); };
+    window.prePdf = (i) => { if(i.files[0]) { document.getElementById('pPdfFrame').src = URL.createObjectURL(i.files[0]); document.getElementById('pPdfFrame').style.display="block"; }};
+    window.delPdf = () => { if(confirm("Remove current PDF?")) { currentPdfUrl = ""; document.getElementById('pPdfFrame').style.display="none"; }};
+
+    async function uploadToDrive(file) {
+        const reader = new FileReader();
+        return new Promise(res => {
+            reader.readAsDataURL(file);
+            reader.onload = async () => {
+                const response = await fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ base64: reader.result.split(',')[1], type: file.type, name: file.name }) });
+                const d = await response.json();
+                res(d.id);
+            };
+        });
     }
 
+    // SAVE LOGIC
     document.getElementById('saveBtn').onclick = async () => {
         const btn = document.getElementById('saveBtn');
-        const pFile = document.getElementById('pdfFile').files[0];
         btn.disabled = true;
+        btn.innerText = "Syncing with Database...";
 
-        let updatedGallery = [...window.existingGallery];
-        let updateData = {
+        let updatedData = {
             title: document.getElementById('title').value,
             author: document.getElementById('author').value,
             category: document.getElementById('category').value,
@@ -220,33 +257,29 @@
             price: document.getElementById('price').value,
             publisher: document.getElementById('publisher').value,
             description: document.getElementById('description').value,
-            pdfUrl: currentPdfUrl // Starts as existing, can be null if deleted
+            gallery: currentGallery,
+            coverUrl: currentCoverUrl,
+            pdfUrl: currentPdfUrl
         };
 
-        try {
-            if(newCoverFile) {
-                updateProg(30, "Cover...");
-                const id = await upload(newCoverFile);
-                updateData.coverUrl = `https://lh3.googleusercontent.com/d/${id}`;
-            }
-            if(pFile) {
-                updateProg(50, "PDF...");
-                const id = await upload(pFile);
-                updateData.pdfUrl = `https://drive.google.com/file/d/${id}/preview`;
-            }
-            if(newGalleryFiles.length > 0) {
-                for(let i=0; i < newGalleryFiles.length; i++) {
-                    updateProg(60 + i, "Photos...");
-                    const id = await upload(newGalleryFiles[i]);
-                    updatedGallery.push(`https://lh3.googleusercontent.com/d/${id}`);
-                }
-            }
-            updateData.gallery = updatedGallery;
-            updateProg(95, "Saving...");
-            await update(bookRef, updateData);
-            alert("Success!");
-            location.href = "manage-books.html";
-        } catch(e) { alert("Error: " + e.message); btn.disabled = false; }
+        // Upload new files if selected
+        const newCovFile = document.getElementById('coverIn').files[0];
+        if (newCovFile) updatedData.coverUrl = await uploadToDrive(newCovFile);
+
+        const newPdfFile = document.getElementById('pdfIn').files[0];
+        if (newPdfFile) {
+            const pid = await uploadToDrive(newPdfFile);
+            updatedData.pdfUrl = `https://drive.google.com/file/d/${pid}/preview`;
+        }
+
+        for (let file of newPhotoFiles) {
+            const gid = await uploadToDrive(file);
+            updatedData.gallery.push(gid);
+        }
+
+        await update(bookRef, updatedData);
+        alert("✅ Book Successfully Updated!");
+        window.location.href = "manage-books.html";
     };
 </script>
 </body>
