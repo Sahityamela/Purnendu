@@ -2,155 +2,186 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Subscribers - Sahitya Mela Admin</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+    <title>Subscribers - SAHITYA MELA</title>
+    
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+Bengali:wght@400;700&display=swap" rel="stylesheet">
+    
     <style>
-        :root { --main: #8B0000; --bg: #f4f7f6; --sidebar: #1a1a1a; }
-        
-        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; display: flex; color: #333; }
+        :root { --main: #8B0000; --bg: #f4f7f6; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; overflow-x: hidden; }
 
-        /* --- SIDEBAR --- */
-        .sidebar { width: 260px; background: var(--sidebar); height: 100vh; position: fixed; left: 0; top: 0; color: white; z-index: 2000; }
-        .sidebar-brand { padding: 25px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.1); font-weight: bold; color: var(--main); font-size: 1.2rem; }
-        .nav-link { display: flex; align-items: center; gap: 12px; padding: 15px 25px; color: #bbb; text-decoration: none; transition: 0.3s; width: 100%; border: none; background: none; text-align: left; font-size: 1rem; cursor: pointer; }
-        .nav-link:hover, .nav-link.active { background: var(--main); color: white; }
+        /* --- NAVBAR & SIDEBAR (Matches your Dashboard) --- */
+        .admin-header { background: white; padding: 12px 20px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 2px 10px rgba(0,0,0,0.1); position: sticky; top: 0; z-index: 1000; }
+        .mobile-menu-toggle { display: block; cursor: pointer; background: none; border: none; font-size: 1.5rem; color: var(--main); }
+        .admin-sidebar { width: 280px; background: white; height: 100vh; position: fixed; left: -285px; border-right: 1px solid #ddd; transition: 0.3s; z-index: 9999; }
+        .admin-sidebar.active { left: 0; }
+        .admin-menu ul { list-style: none; padding: 20px 0; margin: 0; }
+        .admin-menu li a { display: flex; align-items: center; gap: 12px; padding: 15px 25px; text-decoration: none; color: #444; font-weight: 500; border-bottom: 1px solid #eee; }
+        .admin-menu li a:hover, .admin-menu li a.active { background: #fff5f5; color: var(--main); border-right: 4px solid var(--main); }
+        .mobile-backdrop { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 9998; display: none; }
+        .mobile-backdrop.active { display: block; }
+        .logout-btn { background: var(--main); color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-weight: bold; }
 
-        /* --- MAIN CONTENT --- */
-        .main-content { flex: 1; margin-left: 260px; min-height: 100vh; width: 100%; }
-        .admin-header { background: white; padding: 15px 25px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
-        .container { padding: 30px; max-width: 1000px; margin: auto; }
+        /* --- CONTENT AREA --- */
+        .admin-main { padding: 20px; }
+        @media (min-width: 769px) { .admin-main { padding: 40px; } }
 
-        .page-title-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
-        .copy-btn { background: #2c3e50; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-weight: bold; transition: 0.3s; }
-        .copy-btn:hover { background: #000; }
+        .header-row { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; margin-bottom: 30px; }
+        .copy-btn { background: #2c3e50; color: white; border: none; padding: 12px 20px; border-radius: 8px; cursor: pointer; font-weight: bold; transition: 0.3s; display: flex; align-items: center; gap: 8px; }
+        .copy-btn:hover { background: #000; transform: translateY(-2px); }
 
-        /* --- TABLE STYLE --- */
-        .sub-card { background: white; border-radius: 15px; padding: 20px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
+        /* --- PROFESSIONAL TABLE --- */
+        .table-container { background: white; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); overflow: hidden; border: 1px solid #eee; }
         table { width: 100%; border-collapse: collapse; }
-        th { text-align: left; padding: 12px; border-bottom: 2px solid #eee; color: #777; font-size: 0.85rem; text-transform: uppercase; }
-        td { padding: 15px 12px; border-bottom: 1px solid #eee; font-size: 0.95rem; }
+        thead { background: #f9f9f9; }
+        th { text-align: left; padding: 15px; color: #777; font-size: 0.85rem; text-transform: uppercase; border-bottom: 2px solid #eee; }
+        td { padding: 15px; border-bottom: 1px solid #eee; font-size: 0.95rem; vertical-align: middle; }
         
-        .delete-btn { color: #ff4d4d; border: none; background: none; cursor: pointer; font-size: 1.1rem; transition: 0.3s; }
+        .email-cell { font-weight: 600; color: #333; }
+        .date-cell { color: #888; font-size: 0.85rem; }
+        .delete-btn { color: #ff4d4d; border: none; background: none; cursor: pointer; font-size: 1.1rem; transition: 0.2s; padding: 8px; }
         .delete-btn:hover { color: black; transform: scale(1.2); }
 
-        @media (max-width: 768px) {
-            .sidebar { left: -260px; }
-            .main-content { margin-left: 0; }
-            .container { padding: 15px; }
-            .page-title-row { flex-direction: column; gap: 15px; text-align: center; }
+        /* --- MOBILE FIX: Transform Table to Cards --- */
+        @media (max-width: 600px) {
+            table, thead, tbody, th, td, tr { display: block; }
+            thead tr { position: absolute; top: -9999px; left: -9999px; }
+            tr { border-bottom: 2px solid #eee; padding: 15px; position: relative; }
+            td { border: none; padding: 10px 0 10px 40%; position: relative; text-align: right; }
+            td:before { position: absolute; left: 0; width: 35%; text-align: left; font-weight: bold; color: var(--main); content: attr(data-label); }
+            .delete-btn { margin-top: 5px; }
         }
     </style>
 </head>
 <body>
 
-<aside class="sidebar">
-    <div class="sidebar-brand">সাহিত্য মেলা Admin</div>
-    <a href="dashboard.html" class="nav-link"><i class="fas fa-chart-line"></i> <span>Dashboard</span></a>
-    <a href="manage-books.html" class="nav-link"><i class="fas fa-tasks"></i> <span>Manage Library</span></a>
-    <a href="view-subscribers.html" class="nav-link active"><i class="fas fa-users"></i> <span>Subscribers</span></a>
-    <a href="../index.html" class="nav-link"><i class="fas fa-external-link-alt"></i> <span>Live Website</span></a>
-    <hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin: 20px;">
-    <button onclick="logoutUser()" class="nav-link" style="color:#ff4d4d;"><i class="fas fa-sign-out-alt"></i> <span>Log Out</span></button>
-</aside>
-
-<main class="main-content">
     <header class="admin-header">
-        <h2 style="margin:0;">Newsletter List</h2>
-        <div id="adminMail" style="font-weight:bold; color:var(--main);">Admin</div>
+        <div style="display: flex; align-items: center; gap: 15px;">
+            <button class="mobile-menu-toggle" onclick="toggleMenu()"><i class="fas fa-bars"></i></button>
+            <div class="logo" style="display: flex; align-items: center; gap: 10px;">
+                <img src="../assets/images/logo.png" alt="Logo" style="height: 40px;">
+                <span style="font-weight: bold; color: var(--main); font-size: 1.2rem;">Subscribers</span>
+            </div>
+        </div>
+        <button onclick="AdminAuth.logout()" class="logout-btn">Logout</button>
     </header>
 
-    <div class="container">
-        <div class="page-title-row">
+    <aside class="admin-sidebar" id="adminSidebar">
+        <nav class="admin-menu">
+            <ul>
+                <li><a href="dashboard.html"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+                <li><a href="manage-books.html"><i class="fas fa-book"></i> Manage Books</a></li>
+                <li><a href="add-book.html"><i class="fas fa-plus-circle"></i> Add New Book</a></li>
+                <li><a href="view-subscribers.html" class="active"><i class="fas fa-users"></i> Subscribers</a></li>
+                <li><a href="messages.html"><i class="fas fa-envelope"></i> Messages</a></li>
+                <li><a href="../index.html" target="_blank"><i class="fas fa-external-link-alt"></i> View Site</a></li>
+            </ul>
+        </nav>
+    </aside>
+
+    <div class="mobile-backdrop" id="mobileBackdrop" onclick="toggleMenu()"></div>
+
+    <main class="admin-main">
+        <div class="header-row">
             <div>
-                <h1 style="margin:0;">Reader Subscriptions</h1>
-                <p style="color:#666; margin:5px 0 0;">Manage your literary community</p>
+                <h1 style="color: var(--main); margin: 0; font-size: 2rem;">Newsletter List</h1>
+                <p style="color: #666; margin: 5px 0 0;">Manage your growing literary community.</p>
             </div>
-            <button class="copy-btn" id="copyEmails"><i class="fas fa-copy"></i> Copy All Emails</button>
+            <button class="copy-btn" id="copyEmailsBtn"><i class="fas fa-copy"></i> Copy All Emails</button>
         </div>
 
-        <div class="sub-card">
+        <div class="table-container">
             <table>
                 <thead>
                     <tr>
-                        <th>Email Address</th>
-                        <th>Date Joined</th>
+                        <th>Reader Email</th>
+                        <th>Joined Date</th>
                         <th style="text-align: right;">Action</th>
                     </tr>
                 </thead>
-                <tbody id="subList">
-                    <tr><td colspan="3" style="text-align:center; padding:40px;">Fetching subscribers...</td></tr>
+                <tbody id="subscriberList">
+                    <tr><td colspan="3" style="text-align:center; padding:50px; color:#999;">Loading subscribers...</td></tr>
                 </tbody>
             </table>
         </div>
-    </div>
-</main>
+    </main>
 
-<script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getDatabase, ref, onValue, remove } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
-    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { getDatabase, ref, onValue, remove } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
-    const firebaseConfig = {
-        apiKey: "AIzaSyCftWFc6WvMbaY_iwF6DUawi7Qvf0SRKYc",
-        authDomain: "sahitya-mela.firebaseapp.com",
-        projectId: "sahitya-mela",
-        databaseURL: "https://sahitya-mela-default-rtdb.firebaseio.com"
-    };
+        const firebaseConfig = {
+            apiKey: "AIzaSyCftWFc6WvMbaY_iwF6DUawi7Qvf0SRKYc",
+            authDomain: "sahitya-mela.firebaseapp.com",
+            projectId: "sahitya-mela",
+            databaseURL: "https://sahitya-mela-default-rtdb.firebaseio.com"
+        };
 
-    const app = initializeApp(firebaseConfig);
-    const db = getDatabase(app);
-    const auth = getAuth(app);
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getDatabase(app);
 
-    onAuthStateChanged(auth, (user) => {
-        if (!user) window.location.href = "login.html";
-        else document.getElementById('adminMail').innerText = user.email;
-    });
+        // Security check
+        onAuthStateChanged(auth, (user) => {
+            if (!user || user.email !== 'sahityamela64@gmail.com') window.location.href = "login.html";
+        });
 
-    window.logoutUser = () => { if(confirm("Log out?")) signOut(auth).then(() => location.href="login.html"); };
+        // Toggle Sidebar
+        window.toggleMenu = () => {
+            document.getElementById('adminSidebar').classList.toggle('active');
+            document.getElementById('mobileBackdrop').classList.toggle('active');
+        };
 
-    // FETCH SUBSCRIBERS
-    onValue(ref(db, 'subscribers'), (snapshot) => {
-        const list = document.getElementById('subList');
-        list.innerHTML = '';
-        let allEmails = [];
+        // Logout
+        window.AdminAuth = { logout: () => confirm("Logout?") && signOut(auth).then(() => location.href="login.html") };
 
-        if (snapshot.exists()) {
-            const data = snapshot.val();
-            Object.keys(data).reverse().forEach(id => {
-                const s = data[id];
-                allEmails.push(s.email);
-                const date = new Date(s.date).toLocaleDateString('en-GB');
-                
-                const row = `
-                    <tr>
-                        <td><b>${s.email}</b></td>
-                        <td>${date}</td>
-                        <td style="text-align: right;">
-                            <button class="delete-btn" onclick="deleteSub('${id}')"><i class="fas fa-trash-alt"></i></button>
-                        </td>
-                    </tr>
-                `;
-                list.innerHTML += row;
-            });
+        // FETCH DATA
+        onValue(ref(db, 'subscribers'), (snapshot) => {
+            const container = document.getElementById('subscriberList');
+            container.innerHTML = '';
+            let emailArray = [];
 
-            // Copy Functionality
-            document.getElementById('copyEmails').onclick = () => {
-                navigator.clipboard.writeText(allEmails.join(', '));
-                alert("All emails copied to clipboard! You can now paste them into your Gmail 'BCC' field.");
-            };
+            if (snapshot.exists()) {
+                const data = snapshot.val();
+                Object.keys(data).reverse().forEach(id => {
+                    const sub = data[id];
+                    emailArray.push(sub.email);
+                    const formattedDate = sub.date ? new Date(sub.date).toLocaleDateString('en-GB') : '---';
 
-        } else {
-            list.innerHTML = '<tr><td colspan="3" style="text-align:center; padding:40px;">No subscribers yet.</td></tr>';
-        }
-    });
+                    const row = `
+                        <tr>
+                            <td data-label="Email" class="email-cell">${sub.email}</td>
+                            <td data-label="Date" class="date-cell">${formattedDate}</td>
+                            <td style="text-align: right;">
+                                <button class="delete-btn" onclick="deleteEntry('${id}')">
+                                    <i class="fas fa-trash-alt"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    `;
+                    container.innerHTML += row;
+                });
 
-    // DELETE SUBSCRIBER
-    window.deleteSub = (id) => {
-        if(confirm("Remove this email from the list?")) {
-            remove(ref(db, `subscribers/${id}`));
-        }
-    };
-</script>
+                // Copy functionality
+                document.getElementById('copyEmailsBtn').onclick = () => {
+                    navigator.clipboard.writeText(emailArray.join(', '));
+                    alert("All emails copied! Paste them into Gmail's BCC field to send your newsletter.");
+                };
+
+            } else {
+                container.innerHTML = '<tr><td colspan="3" style="text-align:center; padding:50px;">No subscribers found yet.</td></tr>';
+            }
+        });
+
+        // Delete functionality
+        window.deleteEntry = (id) => {
+            if(confirm("Remove this subscriber permanently?")) {
+                remove(ref(db, `subscribers/${id}`));
+            }
+        };
+    </script>
 </body>
 </html>
