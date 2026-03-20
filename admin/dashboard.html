@@ -70,6 +70,7 @@
                     <li><a href="dashboard.html" class="active"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
                     <li><a href="manage-books.html"><i class="fas fa-book"></i> Manage Books</a></li>
                     <li><a href="add-book.html"><i class="fas fa-plus-circle"></i> Add New Book</a></li>
+                    <li><a href="view-subscribers.html"><i class="fas fa-users"></i> Subscribers</a></li>
                     <li><a href="messages.html"><i class="fas fa-envelope"></i> Messages</a></li>
                     <li><a href="../index.html" target="_blank"><i class="fas fa-external-link-alt"></i> View Site</a></li>
                 </ul>
@@ -116,6 +117,15 @@
                     </div>
                 </a>
 
+                <a href="view-subscribers.html" style="text-decoration: none;">
+                    <div class="dashboard-card">
+                        <i class="fas fa-users"></i>
+                        <h3 style="color: #333; margin-bottom: 5px;">Subscribers</h3>
+                        <div id="totalSubCount" style="font-size: 2.5rem; font-weight: bold; color: #f1c40f;">--</div>
+                        <p style="color: #777; font-size: 14px;">Readers joined your newsletter.</p>
+                    </div>
+                </a>
+
                 <a href="messages.html" style="text-decoration: none;">
                     <div class="dashboard-card">
                         <i class="fas fa-envelope-open-text"></i>
@@ -157,6 +167,11 @@
         // 📊 BOOK COUNTER
         onValue(ref(db, 'books'), (snap) => {
             document.getElementById('totalBookCount').innerText = snap.exists() ? Object.keys(snap.val()).length : "0";
+        });
+
+        // 📧 SUBSCRIBER COUNTER
+        onValue(ref(db, 'subscribers'), (snap) => {
+            document.getElementById('totalSubCount').innerText = snap.exists() ? Object.keys(snap.val()).length : "0";
         });
 
         // 🚪 LOGOUT FUNCTION
