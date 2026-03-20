@@ -7,121 +7,108 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root { --main: #8B0000; --bg: #f8f9fa; --card: #ffffff; }
-        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; padding: 0; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; padding: 0; color: #333; }
 
-        /* Navbar */
+        /* Navigation Bar */
         .nav-bar { background: white; padding: 12px 20px; display: flex; align-items: center; box-shadow: 0 2px 15px rgba(0,0,0,0.1); position: sticky; top: 0; z-index: 1000; }
-        .back-btn { background: var(--main); color: white; border: none; padding: 10px 18px; border-radius: 8px; cursor: pointer; text-decoration: none; font-weight: bold; display: flex; align-items: center; gap: 8px; transition: 0.3s; }
+        .back-btn { background: var(--main); color: white; border: none; padding: 10px 18px; border-radius: 8px; cursor: pointer; text-decoration: none; font-weight: bold; display: flex; align-items: center; gap: 8px; transition: 0.3s; font-size: 0.9rem; }
         .back-btn:hover { background: #600000; }
-        .nav-title { margin-left: 20px; font-weight: bold; color: var(--main); font-size: 1.1rem; flex: 1; }
+        .nav-title { margin-left: 20px; font-weight: bold; color: var(--main); font-size: 1.1rem; flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-        .container { max-width: 900px; margin: 20px auto; padding: 0 15px; }
+        .container { max-width: 1000px; margin: 30px auto; padding: 0 15px; }
 
-        /* Book Info */
-        .book-hero { display: flex; gap: 25px; background: var(--card); padding: 25px; border-radius: 15px; box-shadow: 0 5px 20px rgba(0,0,0,0.05); margin-bottom: 25px; }
-        .main-cover { width: 180px; height: 260px; border-radius: 10px; object-fit: cover; border: 1px solid #ddd; }
-        .book-details { flex: 1; }
-        .book-details h1 { margin: 0; font-size: 1.8rem; color: #1a1a1a; }
+        /* Hero Card (Matches your screenshot) */
+        .book-hero { display: flex; gap: 30px; background: var(--card); padding: 30px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); margin-bottom: 30px; border: 1px solid #eee; }
+        .cover-wrapper { flex-shrink: 0; }
+        .main-cover { width: 200px; height: 280px; border-radius: 12px; object-fit: cover; box-shadow: 0 10px 25px rgba(0,0,0,0.1); border: 1px solid #ddd; }
         
-        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 12px; margin-top: 20px; }
-        .stat-box { background: #fafafa; border: 1px solid #eee; padding: 10px; border-radius: 8px; text-align: center; }
-        .stat-box small { display: block; color: #888; font-size: 0.7rem; }
-        .stat-box span { font-weight: bold; color: #333; font-size: 0.9rem; }
+        .book-details { flex: 1; }
+        .book-details h1 { margin: 0; font-size: 2.2rem; color: #1a1a1a; }
+        .author-tag { color: var(--main); font-size: 1.2rem; margin: 5px 0 20px; font-weight: 600; }
+        
+        /* Stats Grid (The 4-6 boxes in your screenshot) */
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 15px; }
+        .stat-box { background: #fdfdfd; border: 1px solid #eee; padding: 15px; border-radius: 12px; text-align: center; box-shadow: 0 2px 5px rgba(0,0,0,0.02); }
+        .stat-box small { display: block; color: #888; text-transform: uppercase; font-size: 0.7rem; letter-spacing: 1px; margin-bottom: 5px; }
+        .stat-box span { font-weight: bold; color: #333; font-size: 1rem; }
+
+        .section-header { margin: 40px 0 20px; padding-bottom: 10px; border-bottom: 2px solid #eee; display: flex; justify-content: space-between; align-items: center; }
+        .section-header h2 { margin: 0; font-size: 1.5rem; color: var(--main); display: flex; align-items: center; gap: 10px; }
+
+        .desc-text { font-size: 1.1rem; line-height: 1.8; color: #555; background: white; padding: 25px; border-radius: 15px; border: 1px solid #eee; }
+
+        /* Reader & PDF */
+        .pdf-frame { width: 100%; height: 700px; border: none; border-radius: 15px; background: #eee; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
+        .dl-btn { background: var(--main); color: white; text-decoration: none; padding: 10px 20px; border-radius: 10px; font-weight: bold; font-size: 0.9rem; display: flex; align-items: center; gap: 8px; }
 
         /* Gallery */
-        .gallery-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 15px; margin-top: 20px; }
-        .gallery-item { width: 100%; height: 220px; border-radius: 10px; object-fit: cover; cursor: pointer; border: 1px solid #ddd; background: white; transition: 0.3s; }
-        .gallery-item:hover { transform: translateY(-5px); }
+        .gallery-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 15px; }
+        .gallery-item { width: 100%; height: 250px; border-radius: 12px; object-fit: cover; cursor: pointer; border: 1px solid #ddd; transition: 0.3s; background: white; }
+        .gallery-item:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
 
-        iframe { width: 100%; height: 650px; border: none; border-radius: 12px; background: #eee; }
+        /* Lightbox for Gallery */
+        #lightbox { display: none; position: fixed; z-index: 5000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); backdrop-filter: blur(8px); justify-content: center; align-items: center; flex-direction: column; }
+        #lightbox img { max-width: 90%; max-height: 80vh; border-radius: 10px; }
+        .close-lb { position: absolute; top: 25px; right: 25px; color: white; font-size: 40px; cursor: pointer; background: var(--main); width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 2px solid white; }
 
-        /* --- FIXED IMAGE MODAL (X MARK FIXED) --- */
-        #imgModal {
-            display: none; 
-            position: fixed; 
-            z-index: 5000; /* Higher than everything */
-            left: 0; top: 0; width: 100%; height: 100%; 
-            background-color: rgba(0,0,0,0.95);
-            backdrop-filter: blur(8px);
-            padding: 20px;
-            box-sizing: border-box;
-        }
-
-        /* THE FIX FOR THE CROSS MARK (X) */
-        .close-modal {
-            position: absolute;
-            top: 25px; 
-            right: 25px;
-            background: var(--main); /* Dark red background */
-            color: white;
-            width: 45px;
-            height: 45px;
-            border-radius: 50%; /* Perfect circle */
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 28px;
-            font-weight: bold;
-            cursor: pointer;
-            z-index: 6000;
-            box-shadow: 0 0 15px rgba(0,0,0,0.5);
-            border: 2px solid white;
-            transition: 0.3s;
-        }
-        .close-modal:hover { transform: scale(1.1); background: #ff0000; }
-
-        .modal-content {
-            margin: auto;
-            display: block;
-            max-width: 95%;
-            max-height: 85vh;
-            border-radius: 10px;
-            margin-top: 40px; /* Space for the button */
-        }
-
-        @media (max-width: 600px) {
+        @media (max-width: 750px) {
             .book-hero { flex-direction: column; align-items: center; text-align: center; }
-            iframe { height: 450px; }
-            .gallery-grid { grid-template-columns: 1fr 1fr; }
-            .close-modal { top: 15px; right: 15px; width: 40px; height: 40px; font-size: 22px; }
+            .stats-grid { grid-template-columns: 1fr 1fr; }
+            .pdf-frame { height: 450px; }
         }
     </style>
 </head>
 <body>
 
-<div id="imgModal" onclick="if(event.target == this) closeFullImg()">
-    <span class="close-modal" onclick="closeFullImg()">&times;</span>
-    <img class="modal-content" id="fullImg">
-    <div style="text-align:center; color:white; margin-top:15px; font-weight:bold; letter-spacing:1px;" id="caption">PAGE PREVIEW</div>
+<div id="lightbox" onclick="if(event.target == this) closeLightbox()">
+    <span class="close-lb" onclick="closeLightbox()">&times;</span>
+    <img id="lbImg">
+    <div style="color:white; margin-top:20px; font-weight:bold;">FULL PREVIEW</div>
 </div>
 
 <nav class="nav-bar">
-    <a href="library.html" class="back-btn"><i class="fas fa-arrow-left"></i> Back</a>
+    <a href="library.html" class="back-btn"><i class="fas fa-arrow-left"></i> Back to Library</a>
     <div class="nav-title" id="navTitle">Sahitya Mela</div>
 </nav>
 
 <div class="container">
     <div class="book-hero">
-        <img id="mainCover" src="" class="main-cover">
+        <div class="cover-wrapper">
+            <img id="mainCover" src="" class="main-cover" alt="Cover">
+        </div>
         <div class="book-details">
             <h1 id="title">Loading...</h1>
-            <div style="color:var(--main); font-weight:bold; margin-top:5px;" id="author"></div>
+            <div class="author-tag" id="author"></div>
+            
             <div class="stats-grid">
-                <div class="stat-box"><small>ISBN</small><span id="isbn">...</span></div>
-                <div class="stat-box"><small>Price</small><span id="price">...</span></div>
-                <div class="stat-box"><small>Date</small><span id="date">...</span></div>
-                <div class="stat-box"><small>Category</small><span id="cat">...</span></div>
+                <div class="stat-box"><small>ISBN</small><span id="isbn">N/A</span></div>
+                <div class="stat-box"><small>Price</small><span id="price">Free</span></div>
+                <div class="stat-box"><small>Date</small><span id="date">N/A</span></div>
+                <div class="stat-box"><small>Category</small><span id="cat">General</span></div>
+                <div class="stat-box"><small>Language</small><span id="lang">Bengali</span></div>
+                <div class="stat-box"><small>Pages</small><span id="pages">N/A</span></div>
             </div>
+            <div id="pubArea" style="margin-top:20px; font-size:0.9rem; color:#666;"><b>Publisher:</b> <span id="publisher">N/A</span></div>
         </div>
     </div>
 
+    <div class="section-header">
+        <h2><i class="fas fa-info-circle"></i> About this Book</h2>
+    </div>
+    <div class="desc-text" id="description">No description available.</div>
+
     <div id="pdfSection" style="display:none;">
-        <h2 style="color:var(--main); border-bottom:2px solid #eee; padding-bottom:10px;">Read Online</h2>
-        <iframe id="pdfIframe" src=""></iframe>
+        <div class="section-header">
+            <h2><i class="fas fa-book-open"></i> Read Online</h2>
+            <a id="dlBtn" href="#" class="dl-btn" target="_blank"><i class="fas fa-download"></i> Download PDF</a>
+        </div>
+        <iframe id="pdfIframe" class="pdf-frame"></iframe>
     </div>
 
-    <div id="galSection" style="display:none; margin-top:40px;">
-        <h2 style="color:var(--main); border-bottom:2px solid #eee; padding-bottom:10px;">Book Gallery</h2>
+    <div id="galSection" style="display:none;">
+        <div class="section-header">
+            <h2><i class="fas fa-images"></i> Book Gallery</h2>
+        </div>
         <div class="gallery-grid" id="galGrid"></div>
     </div>
 </div>
@@ -140,19 +127,19 @@
 
     function cleanId(u) {
         if (!u) return "";
-        let id = u.includes('id=') ? u.split('id=')[1].split('&')[0] : (u.includes('/d/')) ? u.split('/d/')[1].split('/')[0] : u;
+        let id = u.includes('id=') ? u.split('id=')[1].split('&')[0] : (u.includes('/d/') ? u.split('/d/')[1].split('/')[0] : u);
         return id.toString().replace(/[{}]/g, '').trim();
     }
 
-    // Modal Functions
-    window.openFullImg = (url) => {
-        document.getElementById('fullImg').src = url;
-        document.getElementById('imgModal').style.display = "block";
-        document.body.style.overflow = "hidden"; // Stop background scroll
+    // Lightbox Logic
+    window.openLightbox = (url) => {
+        document.getElementById('lbImg').src = url;
+        document.getElementById('lightbox').style.display = "flex";
+        document.body.style.overflow = "hidden";
     };
-    window.closeFullImg = () => {
-        document.getElementById('imgModal').style.display = "none";
-        document.body.style.overflow = "auto"; // Re-enable scroll
+    window.closeLightbox = () => {
+        document.getElementById('lightbox').style.display = "none";
+        document.body.style.overflow = "auto";
     };
 
     if (bookId) {
@@ -162,31 +149,38 @@
                 document.getElementById('navTitle').innerText = b.title;
                 document.getElementById('title').innerText = b.title;
                 document.getElementById('author').innerText = "By " + (b.author || "Unknown");
+                document.getElementById('description').innerText = b.description || "The publisher has provided no summary.";
+                
+                // Meta Info
                 document.getElementById('isbn').innerText = b.isbn || "N/A";
                 document.getElementById('price').innerText = b.price ? "৳" + b.price : "Free";
                 document.getElementById('date').innerText = b.pubDate || "N/A";
                 document.getElementById('cat').innerText = b.category || "General";
+                document.getElementById('lang').innerText = b.language || "Bengali";
+                document.getElementById('pages').innerText = b.pages || "N/A";
+                document.getElementById('publisher').innerText = b.publisher || "N/A";
                 
                 const coverId = cleanId(b.coverUrl);
-                document.getElementById('mainCover').src = `https://drive.google.com/thumbnail?id=${coverId}&sz=w600`;
+                document.getElementById('mainCover').src = `https://lh3.googleusercontent.com/d/${coverId}`;
 
+                // Handle PDF and Download
                 if (b.pdfUrl) {
                     document.getElementById('pdfSection').style.display = 'block';
                     document.getElementById('pdfIframe').src = b.pdfUrl;
+                    const pid = cleanId(b.pdfUrl);
+                    document.getElementById('dlBtn').href = `https://drive.google.com/uc?export=download&id=${pid}`;
                 }
 
-                if (b.gallery && Array.isArray(b.gallery)) {
+                // Handle Gallery
+                if (b.gallery && Array.isArray(b.gallery) && b.gallery.length > 0) {
                     document.getElementById('galSection').style.display = 'block';
                     const grid = document.getElementById('galGrid');
                     b.gallery.forEach(url => {
                         const id = cleanId(url);
                         const img = document.createElement('img');
-                        const thumbnail = `https://drive.google.com/thumbnail?id=${id}&sz=w400`;
-                        const fullSize = `https://drive.google.com/thumbnail?id=${id}&sz=w1000`;
-                        
-                        img.src = thumbnail;
+                        img.src = `https://lh3.googleusercontent.com/d/${id}`;
                         img.className = 'gallery-item';
-                        img.onclick = () => openFullImg(fullSize);
+                        img.onclick = () => openLightbox(`https://lh3.googleusercontent.com/d/${id}`);
                         grid.appendChild(img);
                     });
                 }
@@ -194,5 +188,6 @@
         });
     }
 </script>
+
 </body>
 </html>
