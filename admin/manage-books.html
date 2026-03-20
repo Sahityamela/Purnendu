@@ -8,62 +8,65 @@
     <style>
         :root { --main: #8B0000; --bg: #f0f2f5; --danger: #dc3545; --sidebar: #1a1a1a; --white: #ffffff; }
         
-        body { font-family: 'Segoe UI', Roboto, sans-serif; background: var(--bg); margin: 0; display: flex; color: #333; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; display: flex; color: #333; overflow-x: hidden; }
 
-        /* --- SIDEBAR --- */
-        .sidebar { width: 260px; background: var(--sidebar); height: 100vh; position: fixed; left: 0; top: 0; color: white; transition: 0.3s; z-index: 2000; }
-        .sidebar-brand { padding: 25px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.1); font-size: 1.2rem; font-weight: bold; color: var(--main); }
-        .nav-link { display: flex; align-items: center; gap: 12px; padding: 15px 25px; color: #bbb; text-decoration: none; transition: 0.3s; cursor: pointer; border: none; background: none; width: 100%; text-align: left; font-size: 1rem; }
-        .nav-link:hover { background: rgba(255,255,255,0.05); color: white; }
-        .nav-link.active { background: var(--main); color: white; }
+        /* --- SIDEBAR & OVERLAY --- */
+        .sidebar { width: 260px; background: var(--sidebar); height: 100vh; position: fixed; left: -260px; top: 0; color: white; transition: 0.3s; z-index: 3000; }
+        .sidebar.active { left: 0; }
+        .sidebar-brand { padding: 25px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.1); font-weight: bold; color: var(--main); font-size: 1.2rem; }
+        .nav-link { display: flex; align-items: center; gap: 12px; padding: 15px 25px; color: #bbb; text-decoration: none; transition: 0.3s; border:none; background:none; width:100%; text-align:left; font-size:1rem; cursor:pointer; }
+        .nav-link:hover, .nav-link.active { background: var(--main); color: white; }
+        
+        .overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 2500; }
+        .overlay.active { display: block; }
 
         /* --- MAIN CONTENT --- */
-        .main-content { flex: 1; margin-left: 260px; min-height: 100vh; transition: 0.3s; width: 100%; }
-        .admin-header { background: var(--white); padding: 15px 25px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.05); position: sticky; top: 0; z-index: 1000; }
-        .menu-toggle { display: none; font-size: 1.5rem; cursor: pointer; color: var(--main); }
-        .container { padding: 20px; max-width: 1400px; margin: auto; }
+        .main-content { flex: 1; margin-left: 0; min-height: 100vh; width: 100%; transition: 0.3s; }
+        @media (min-width: 992px) { 
+            .main-content { margin-left: 260px; } 
+            .sidebar { left: 0; } 
+            .menu-toggle { display: none !important; } 
+        }
 
-        /* --- GRID & CARDS --- */
-        .books-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; width: 100%; }
-        .book-card { background: var(--white); border-radius: 15px; padding: 20px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); text-align: center; transition: transform 0.2s; display: flex; flex-direction: column; justify-content: space-between; }
-        .book-card:hover { transform: translateY(-5px); }
-        .book-card img { width: 100%; height: 220px; object-fit: contain; border-radius: 10px; margin-bottom: 15px; background: #f8f8f8; }
-        .book-title { font-size: 1.1rem; margin: 0 0 5px; color: #222; height: 2.4em; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; font-weight: bold; }
-        .book-author { font-size: 0.9rem; color: #777; margin-bottom: 15px; }
+        .admin-header { background: var(--white); padding: 10px 15px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.05); position: sticky; top: 0; z-index: 1000; }
+        .menu-toggle { font-size: 1.5rem; cursor: pointer; color: var(--main); padding: 5px; }
+
+        /* --- BOOKS GRID --- */
+        .container { padding: 15px; }
+        .books-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px; }
+        @media (min-width: 600px) { .books-grid { grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 20px; } }
+
+        .book-card { background: var(--white); border-radius: 12px; padding: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); text-align: center; display: flex; flex-direction: column; justify-content: space-between; }
+        .book-card img { width: 100%; height: 160px; object-fit: contain; border-radius: 8px; margin-bottom: 10px; background: #f9f9f9; cursor: pointer; }
+        .book-title { font-size: 0.95rem; font-weight: bold; height: 2.4em; overflow: hidden; margin-bottom: 5px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+        .book-author { font-size: 0.8rem; color: #777; margin-bottom: 10px; }
+
+        /* --- QUICK VIEW MODAL --- */
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 5000; overflow-y: auto; padding: 10px; box-sizing: border-box; backdrop-filter: blur(5px); }
+        .modal-content { background: white; width: 100%; max-width: 800px; margin: 20px auto; border-radius: 15px; padding: 20px; position: relative; box-sizing: border-box; animation: slideUp 0.3s ease; }
+        @keyframes slideUp { from { transform: translateY(30px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        .close-modal { position: absolute; top: 10px; right: 15px; font-size: 30px; cursor: pointer; color: #999; z-index: 10; }
+
+        .modal-body-grid { display: grid; grid-template-columns: 1fr; gap: 20px; }
+        @media (min-width: 600px) { .modal-body-grid { grid-template-columns: 200px 1fr; } }
+
+        .m-cover { width: 100%; max-width: 200px; border-radius: 10px; display: block; margin: 0 auto; cursor: pointer; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+        .m-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; background: #f8f8f8; padding: 12px; border-radius: 10px; font-size: 0.8rem; margin: 15px 0; }
+        
+        .m-gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); gap: 8px; margin-top: 10px; }
+        .m-gallery img { width: 100%; height: 80px; object-fit: cover; border-radius: 5px; cursor: pointer; border: 1px solid #ddd; }
+
+        /* --- LIGHTBOX (SAME PAGE VIEW) --- */
+        #lightbox { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 9999; justify-content: center; align-items: center; cursor: pointer; }
+        #lightbox img { max-width: 95%; max-height: 90vh; object-fit: contain; border-radius: 5px; }
 
         /* --- BUTTONS --- */
-        .btn-group { display: flex; gap: 8px; width: 100%; }
-        .btn { flex: 1; border: none; padding: 12px 5px; border-radius: 8px; cursor: pointer; color: white; font-weight: bold; text-decoration: none; font-size: 0.8rem; display: flex; align-items: center; justify-content: center; gap: 5px; transition: 0.2s; }
-        .btn-view { background: #007bff; }
-        .btn-edit { background: #28a745; }
+        .btn-group { display: flex; gap: 5px; }
+        .btn { flex: 1; border: none; padding: 10px 2px; border-radius: 6px; color: white; font-size: 0.75rem; cursor: pointer; display: flex; align-items: center; justify-content: center; text-decoration: none; font-weight: bold; }
+        .btn-view { background: #007bff; } 
+        .btn-edit { background: #28a745; } 
         .btn-delete { background: var(--danger); }
         .btn:hover { opacity: 0.8; }
-
-        /* --- MODAL SYSTEM --- */
-        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 5000; overflow-y: auto; backdrop-filter: blur(5px); }
-        .modal-content { background: white; width: 95%; max-width: 850px; margin: 40px auto; border-radius: 20px; padding: 30px; position: relative; animation: slideUp 0.3s ease; }
-        @keyframes slideUp { from { transform: translateY(40px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-        .close-modal { position: absolute; top: 15px; right: 20px; font-size: 30px; cursor: pointer; color: #888; }
-        
-        .modal-body-grid { display: grid; grid-template-columns: 220px 1fr; gap: 30px; margin-top: 10px; }
-        .m-cover { width: 100%; border-radius: 12px; box-shadow: 0 10px 20px rgba(0,0,0,0.1); border: 1px solid #eee; }
-        .m-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; background: #f9f9f9; padding: 15px; border-radius: 12px; margin: 15px 0; font-size: 0.85rem; }
-        .m-gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 10px; margin-top: 15px; }
-        .m-gallery img { width: 100%; height: 100px; object-fit: cover; border-radius: 8px; border: 1px solid #ddd; cursor: pointer; }
-
-        /* --- RESPONSIVE --- */
-        @media (max-width: 992px) {
-            .sidebar { left: -260px; }
-            .sidebar.active { left: 0; }
-            .main-content { margin-left: 0; }
-            .menu-toggle { display: block; }
-            .overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1500; }
-            .overlay.active { display: block; }
-        }
-        @media (max-width: 600px) {
-            .modal-body-grid { grid-template-columns: 1fr; text-align: center; }
-            .m-cover { width: 180px; margin: auto; }
-        }
     </style>
 </head>
 <body>
@@ -86,15 +89,15 @@
     <header class="admin-header">
         <div style="display: flex; align-items: center; gap: 15px;">
             <i class="fas fa-bars menu-toggle" onclick="toggleMenu()"></i>
-            <h2 style="margin:0;">Library Manager</h2>
+            <h2 style="margin:0; font-size: 1.1rem;">Library Manager</h2>
         </div>
-        <div id="stats" style="background: var(--main); color:white; padding: 5px 12px; border-radius: 20px; font-size: 0.85rem; font-weight: bold;">Loading...</div>
+        <div id="stats" style="background: var(--main); color:white; padding: 5px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: bold;">Loading...</div>
     </header>
 
     <div class="container">
         <div id="loader" style="text-align:center; padding: 100px 0;">
             <i class="fas fa-spinner fa-spin" style="font-size: 2rem; color: var(--main);"></i>
-            <p>Fetching your books...</p>
+            <p>Fetching books...</p>
         </div>
         <div id="booksGrid" class="books-grid"></div>
     </div>
@@ -105,6 +108,11 @@
         <span class="close-modal" onclick="closeModal()">×</span>
         <div id="modalBody"></div>
     </div>
+</div>
+
+<div id="lightbox" onclick="this.style.display='none'">
+    <img id="lbImg" src="">
+    <div style="position:absolute; top:20px; right:20px; color:white; font-size:35px;">&times;</div>
 </div>
 
 <script type="module">
@@ -124,17 +132,18 @@
     const db = getDatabase(app);
     const auth = getAuth(app);
 
-    // SESSION PROTECTION
+    // PROTECTION
     onAuthStateChanged(auth, (user) => { if (!user) window.location.href = "login.html"; });
 
-    // UI HELPERS
+    // SIDEBAR TOGGLE
     window.toggleMenu = () => {
         document.getElementById('sidebar').classList.toggle('active');
         document.getElementById('overlay').classList.toggle('active');
     };
     document.getElementById('overlay').onclick = toggleMenu;
-    window.logoutUser = () => { if(confirm("Log out now?")) signOut(auth).then(() => location.href="login.html"); };
+    window.logoutUser = () => { if(confirm("Log out?")) signOut(auth).then(() => location.href="login.html"); };
 
+    // IMAGE ID FIXER
     function fix(u) {
         if(!u) return "../assets/images/logo.png";
         let id = u.includes('id=') ? u.split('id=')[1].split('&')[0] : (u.includes('/d/') ? u.split('/d/')[1].split('/')[0] : u);
@@ -142,7 +151,7 @@
         return `https://lh3.googleusercontent.com/d/${id}`;
     }
 
-    // LOAD BOOKS
+    // LIST BOOKS
     onValue(ref(db, 'books'), (snapshot) => {
         const grid = document.getElementById('booksGrid');
         const loader = document.getElementById('loader');
@@ -159,9 +168,11 @@
                 const card = document.createElement('div');
                 card.className = 'book-card';
                 card.innerHTML = `
-                    <img src="${fix(b.coverUrl)}" onerror="this.src='../assets/images/logo.png'">
-                    <div class="book-title">${b.title}</div>
-                    <div class="book-author">By ${b.author}</div>
+                    <img src="${fix(b.coverUrl)}" onclick="openFull('${fix(b.coverUrl)}')" onerror="this.src='../assets/images/logo.png'">
+                    <div>
+                        <div class="book-title">${b.title}</div>
+                        <div class="book-author">By ${b.author}</div>
+                    </div>
                     <div class="btn-group">
                         <button onclick="viewBook('${id}')" class="btn btn-view" title="Quick View"><i class="fas fa-eye"></i></button>
                         <a href="edit-book.html?id=${id}" class="btn btn-edit" title="Edit"><i class="fas fa-edit"></i></a>
@@ -172,59 +183,63 @@
             });
             stats.innerText = count + " BOOKS";
         } else {
-            grid.innerHTML = "<p style='text-align:center; width:100%;'>No books found in the library.</p>";
+            grid.innerHTML = "<p style='text-align:center; width:100%;'>Library is empty.</p>";
             stats.innerText = "0 BOOKS";
         }
     });
 
-    // QUICK VIEW LOGIC
+    // LIGHTBOX LOGIC
+    window.openFull = (url) => {
+        document.getElementById('lbImg').src = url;
+        document.getElementById('lightbox').style.display = 'flex';
+    };
+
+    // MODAL LOGIC
     window.viewBook = (id) => {
         get(ref(db, 'books/' + id)).then((s) => {
             if (s.exists()) {
                 const b = s.val();
-                
-                // Extract PDF ID for direct download
+                const coverUrl = fix(b.coverUrl);
                 const pdfId = b.pdfUrl ? b.pdfUrl.split('/d/')[1]?.split('/')[0] || b.pdfUrl.split('id=')[1]?.split('&')[0] : null;
                 const downloadLink = pdfId ? `https://drive.google.com/uc?export=download&id=${pdfId}` : "#";
 
                 document.getElementById('modalBody').innerHTML = `
                     <div class="modal-body-grid">
                         <div>
-                            <img src="${fix(b.coverUrl)}" class="m-cover">
+                            <img src="${coverUrl}" class="m-cover" onclick="openFull('${coverUrl}')">
                             ${b.pdfUrl ? `
-                                <a href="${downloadLink}" target="_blank" class="btn" style="background:#2d2d2d; margin-top:15px; padding:15px; width:100%; box-sizing:border-box;">
+                                <a href="${downloadLink}" target="_blank" class="btn" style="background:#333; margin-top:12px; padding:12px; width:100%; box-sizing:border-box;">
                                     <i class="fas fa-file-pdf"></i> Download PDF
                                 </a>
                             ` : `
-                                <div style="margin-top:15px; padding:10px; background:#f0f0f0; color:#888; border-radius:8px; text-align:center; font-size:0.8rem;">
+                                <div style="margin-top:12px; padding:10px; background:#eee; color:#888; border-radius:8px; text-align:center; font-size:0.75rem;">
                                     <i class="fas fa-times-circle"></i> No PDF Attached
                                 </div>
                             `}
                         </div>
                         <div>
-                            <h2 style="margin:0; color:var(--main);">${b.title}</h2>
-                            <p style="font-size:1.1rem; margin:5px 0;"><b>Author:</b> ${b.author}</p>
-                            ${b.editor ? `<p style="color:#666; font-style:italic; margin-top:-5px;">Editor: ${b.editor}</p>` : ''}
+                            <h3 style="margin:0; color:var(--main);">${b.title}</h3>
+                            <p style="font-size:0.9rem; margin:5px 0;"><b>Author:</b> ${b.author}</p>
+                            ${b.editor ? `<p style="color:#666; font-size:0.85rem; margin-top:-5px; font-style:italic;">Editor: ${b.editor}</p>` : ''}
                             
                             <div class="m-stats">
-                                <div><b>Category:</b> ${b.category || 'General'}</div>
-                                <div><b>Price:</b> ${b.price ? '৳'+b.price : 'Free'}</div>
-                                <div><b>ISBN:</b> ${b.isbn || 'N/A'}</div>
+                                <div><b>Cat:</b> ${b.category || 'General'}</div>
+                                <div><b>Price:</b> ${b.price || 'Free'}</div>
                                 <div><b>Pages:</b> ${b.pages || 'N/A'}</div>
                                 <div><b>Language:</b> ${b.language || 'Bengali'}</div>
+                                <div><b>ISBN:</b> ${b.isbn || 'N/A'}</div>
                                 <div><b>Date:</b> ${b.pubDate || 'N/A'}</div>
                             </div>
-
-                            <div style="margin-top:20px; border-top:1px solid #eee; padding-top:15px;">
-                                <h4 style="margin:0 0 5px;">Description</h4>
-                                <p style="line-height:1.6; color:#555; white-space: pre-wrap; font-size:0.95rem;">${b.description || 'No summary available.'}</p>
-                            </div>
+                            <h4 style="margin:15px 0 5px; font-size:0.9rem;">Description:</h4>
+                            <p style="line-height:1.5; color:#555; font-size:0.85rem; white-space:pre-wrap; margin:0;">${b.description || 'No summary available.'}</p>
                         </div>
                     </div>
                     ${b.gallery && b.gallery.length > 0 ? `
-                        <h4 style="margin:20px 0 10px; border-top:1px solid #eee; padding-top:15px;">Inside Gallery</h4>
-                        <div class="m-gallery">
-                            ${b.gallery.map(url => `<img src="${fix(url)}" onclick="window.open('${url}', '_blank')">`).join('')}
+                        <div style="margin-top:18px; border-top:1px solid #eee; padding-top:12px;">
+                            <h4 style="margin:0 0 10px; font-size:0.9rem;">Gallery Photos:</h4>
+                            <div class="m-gallery">
+                                ${b.gallery.map(url => `<img src="${fix(url)}" onclick="openFull('${fix(url)}')">`).join('')}
+                            </div>
                         </div>
                     ` : ''}
                 `;
@@ -240,7 +255,7 @@
     };
 
     window.del = async (id) => {
-        if (confirm("Permanently delete this book from the library?")) {
+        if (confirm("Permanently delete this book?")) {
             try { await remove(ref(db, 'books/' + id)); } 
             catch (e) { alert("Permission Denied."); }
         }
