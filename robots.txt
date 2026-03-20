@@ -1,0 +1,9 @@
+# Welcome to Sahitya Mela
+User-agent: *
+Allow: /
+
+# Prevent bots from crawling the admin area
+Disallow: /Purnendu/admin/
+
+# Point Google to your map
+Sitemap: https://sahityamela.github.io/Purnendu/sitemap.xml
