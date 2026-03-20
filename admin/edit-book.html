@@ -8,32 +8,20 @@
     <style>
         :root { --main: #8B0000; --bg: #f4f4f4; --danger: #dc3545; }
         body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; padding: 0; }
-        
         .admin-nav { background: white; padding: 12px 15px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.1); position: sticky; top: 0; z-index: 100; }
         .container { padding: 15px; max-width: 900px; margin: auto; }
         .form-card { background: white; padding: 20px; border-radius: 15px; box-shadow: 0 5px 20px rgba(0,0,0,0.05); }
-
-        /* Responsive Grid: 1 column on mobile, 2 on desktop */
         .grid { display: grid; grid-template-columns: 1fr; gap: 15px; margin-bottom: 15px; }
         @media (min-width: 650px) { .grid { grid-template-columns: 1fr 1fr; } }
-
         label { display: block; font-weight: bold; margin-bottom: 6px; font-size: 0.9rem; color: #444; }
         input, select, textarea { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 8px; box-sizing: border-box; font-size: 16px; }
-
-        /* Media Previews */
         .preview-box { width: 120px; height: 160px; border: 2px solid var(--main); border-radius: 10px; margin-top: 10px; background: #fff; overflow: hidden; position: relative; }
         .preview-box img { width: 100%; height: 100%; object-fit: contain; }
-
         .pdf-preview { width: 100%; height: 300px; border: 1px solid #ddd; border-radius: 10px; margin-top: 10px; }
-
-        /* Gallery System */
         .gallery-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(90px, 1fr)); gap: 12px; margin-top: 10px; border: 1px dashed #ccc; padding: 10px; border-radius: 10px; }
         .g-item { position: relative; height: 90px; border-radius: 8px; overflow: hidden; border: 1px solid #ddd; background: #eee; }
         .g-item img { width: 100%; height: 100%; object-fit: cover; }
-
-        /* RED X BUTTON */
         .remove-btn { position: absolute; top: 4px; right: 4px; background: var(--danger); color: white; border: none; border-radius: 50%; width: 26px; height: 26px; cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: 10; box-shadow: 0 2px 4px rgba(0,0,0,0.3); font-size: 12px; }
-
         #saveBtn { width: 100%; padding: 18px; background: var(--main); color: white; border: none; border-radius: 12px; font-weight: bold; font-size: 1.1rem; cursor: pointer; margin-top: 25px; transition: 0.3s; }
         #saveBtn:disabled { background: #ccc; cursor: not-allowed; }
     </style>
@@ -54,10 +42,11 @@
         <div id="editForm" style="display:none;">
             <div class="grid">
                 <div><label>Book Title *</label><input type="text" id="title" required></div>
-                <div><label>Author/Editor *</label><input type="text" id="author" required></div>
+                <div><label>Author *</label><input type="text" id="author" required></div>
             </div>
 
             <div class="grid">
+                <div><label>Editor</label><input type="text" id="editor" placeholder="Optional"></div>
                 <div>
                     <label>Category</label>
                     <select id="category">
@@ -68,22 +57,21 @@
                         <option value="Short Story">Short Story</option>
                     </select>
                 </div>
+            </div>
+
+            <div class="grid">
                 <div><label>Language</label><input type="text" id="language"></div>
-            </div>
-
-            <div class="grid">
                 <div><label>Publication Date</label><input type="date" id="pubDate"></div>
+            </div>
+
+            <div class="grid">
                 <div><label>ISBN Number</label><input type="text" id="isbn"></div>
-            </div>
-
-            <div class="grid">
                 <div><label>Number of Pages</label><input type="number" id="pages"></div>
-                <div><label>Price (৳)</label><input type="text" id="price"></div>
             </div>
 
             <div class="grid">
+                <div><label>Price (৳)</label><input type="text" id="price"></div>
                 <div><label>Publisher</label><input type="text" id="publisher"></div>
-                <div></div>
             </div>
 
             <label>Description / Summary</label>
@@ -119,21 +107,30 @@
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getDatabase, ref, get, update } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+    // ADDED: Import Auth
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
     const fbConfig = { 
         apiKey: "AIzaSyCftWFc6WvMbaY_iwF6DUawi7Qvf0SRKYc", 
+        authDomain: "sahitya-mela.firebaseapp.com",
         databaseURL: "https://sahitya-mela-default-rtdb.firebaseio.com", 
-        projectId: "sahitya-mela" 
+        projectId: "sahitya-mela",
+        appId: "1:283544938564:web:b9bba32cca9e52e6aab411"
     };
-    const db = getDatabase(initializeApp(fbConfig));
-    
-    // Deployment URL from your Google Apps Script
+
+    const fbApp = initializeApp(fbConfig);
+    const db = getDatabase(fbApp);
+    const auth = getAuth(fbApp);
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzdDsLPr7F-6gwkKzdJLNgCUZPIWIryVdKqrdnrtDX4DOK7hkLlhnXxcBjvEMH69d3r/exec";
 
     const bookId = new URLSearchParams(window.location.search).get('id');
     const bookRef = ref(db, 'books/' + bookId);
 
-    // Initializing state
+    // GATEKEEPER
+    onAuthStateChanged(auth, (user) => {
+        if (!user) window.location.href = "login.html";
+    });
+
     let currentGallery = [];
     let newPhotoFiles = [];
     let currentCoverUrl = "";
@@ -144,8 +141,7 @@
         let id = u;
         if (u.includes('id=')) id = u.split('id=')[1].split('&')[0];
         else if (u.includes('/d/')) id = u.split('/d/')[1].split('/')[0];
-        id = id.toString().replace(/[{}]/g, '').trim();
-        return `https://lh3.googleusercontent.com/d/${id}`;
+        return `https://lh3.googleusercontent.com/u/0/d/${id}`;
     }
 
     // Load Existing Data
@@ -154,6 +150,7 @@
             const data = snapshot.val();
             document.getElementById('title').value = data.title || "";
             document.getElementById('author').value = data.author || "";
+            document.getElementById('editor').value = data.editor || ""; // Loaded Editor
             document.getElementById('category').value = data.category || "General";
             document.getElementById('language').value = data.language || "";
             document.getElementById('pubDate').value = data.pubDate || "";
@@ -178,9 +175,11 @@
             document.getElementById('loader').style.display = "none";
             document.getElementById('editForm').style.display = "block";
         }
+    }).catch(e => {
+        console.error(e);
+        alert("Permission Denied! Make sure you are logged in.");
     });
 
-    // Gallery Render Logic
     function renderOldGallery() {
         const area = document.getElementById('gArea');
         area.innerHTML = "";
@@ -194,7 +193,7 @@
     }
 
     window.removeOld = (i) => {
-        if (confirm("Delete this photo? This cannot be undone after saving.")) {
+        if (confirm("Delete this photo?")) {
             currentGallery.splice(i, 1);
             renderOldGallery();
         }
@@ -240,8 +239,9 @@
         });
     }
 
-    // SAVE LOGIC
     document.getElementById('saveBtn').onclick = async () => {
+        if(!auth.currentUser) return alert("Session expired.");
+
         const btn = document.getElementById('saveBtn');
         btn.disabled = true;
         btn.innerText = "Syncing with Database...";
@@ -249,6 +249,7 @@
         let updatedData = {
             title: document.getElementById('title').value,
             author: document.getElementById('author').value,
+            editor: document.getElementById('editor').value, // Save Editor
             category: document.getElementById('category').value,
             language: document.getElementById('language').value,
             pubDate: document.getElementById('pubDate').value,
@@ -262,24 +263,30 @@
             pdfUrl: currentPdfUrl
         };
 
-        // Upload new files if selected
-        const newCovFile = document.getElementById('coverIn').files[0];
-        if (newCovFile) updatedData.coverUrl = await uploadToDrive(newCovFile);
+        try {
+            const newCovFile = document.getElementById('coverIn').files[0];
+            if (newCovFile) updatedData.coverUrl = await uploadToDrive(newCovFile);
 
-        const newPdfFile = document.getElementById('pdfIn').files[0];
-        if (newPdfFile) {
-            const pid = await uploadToDrive(newPdfFile);
-            updatedData.pdfUrl = `https://drive.google.com/file/d/${pid}/preview`;
+            const newPdfFile = document.getElementById('pdfIn').files[0];
+            if (newPdfFile) {
+                const pid = await uploadToDrive(newPdfFile);
+                updatedData.pdfUrl = `https://drive.google.com/file/d/${pid}/preview`;
+            }
+
+            for (let file of newPhotoFiles) {
+                const gid = await uploadToDrive(file);
+                updatedData.gallery.push(gid);
+            }
+
+            await update(bookRef, updatedData);
+            alert("✅ Book Successfully Updated!");
+            window.location.href = "manage-books.html";
+        } catch(e) {
+            console.error(e);
+            alert("Update Failed! Check console for errors.");
+            btn.disabled = false;
+            btn.innerText = "Save All Changes";
         }
-
-        for (let file of newPhotoFiles) {
-            const gid = await uploadToDrive(file);
-            updatedData.gallery.push(gid);
-        }
-
-        await update(bookRef, updatedData);
-        alert("✅ Book Successfully Updated!");
-        window.location.href = "manage-books.html";
     };
 </script>
 </body>
