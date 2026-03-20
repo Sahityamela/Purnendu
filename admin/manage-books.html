@@ -10,32 +10,39 @@
         
         body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; display: flex; color: #333; overflow-x: hidden; }
 
-        /* --- SIDEBAR FIX --- */
+        /* --- SIDEBAR GHOST-PROOF FIX --- */
         .sidebar { 
             width: 260px; background: var(--sidebar); height: 100vh; position: fixed; 
-            left: -300px; top: 0; color: white; transition: 0.3s; z-index: 3000; 
-            visibility: hidden; 
+            top: 0; left: 0; color: white; transition: transform 0.3s ease, visibility 0.3s; 
+            z-index: 3000; 
+            transform: translateX(-105%); /* Move it completely off-screen */
+            visibility: hidden;
+            box-shadow: none;
+            overflow: hidden; /* Prevent red background bleed */
         }
-        .sidebar.active { left: 0; visibility: visible; }
-        .sidebar-brand { padding: 25px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.1); font-weight: bold; color: var(--main); font-size: 1.2rem; }
-        .nav-link { display: flex; align-items: center; gap: 12px; padding: 15px 25px; color: #bbb; text-decoration: none; transition: 0.3s; border:none; background:none; width:100%; text-align:left; font-size:1rem; cursor:pointer; }
-        .nav-link:hover, .nav-link.active { background: var(--main); color: white; }
+        .sidebar.active { transform: translateX(0); visibility: visible; box-shadow: 10px 0 30px rgba(0,0,0,0.3); }
         
-        .overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 2500; }
+        .sidebar-brand { padding: 25px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.1); font-weight: bold; color: var(--main); font-size: 1.2rem; }
+        .nav-link { display: flex; align-items: center; gap: 12px; padding: 15px 25px; color: #bbb; text-decoration: none; transition: 0.3s; border:none; background:none; width:100%; text-align:left; font-size:1rem; cursor:pointer; box-sizing: border-box; }
+        
+        /* Active Link Styling */
+        .nav-link:hover, .nav-link.active { background: var(--main); color: white; outline: none; }
+        
+        .overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 2500; backdrop-filter: blur(2px); }
         .overlay.active { display: block; }
 
         /* --- MAIN CONTENT --- */
         .main-content { flex: 1; margin-left: 0; min-height: 100vh; width: 100%; transition: 0.3s; }
         @media (min-width: 992px) { 
             .main-content { margin-left: 260px; } 
-            .sidebar { left: 0; visibility: visible; } 
+            .sidebar { transform: translateX(0); visibility: visible; } 
             .menu-toggle { display: none !important; } 
         }
 
         .admin-header { background: var(--white); padding: 10px 15px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.05); position: sticky; top: 0; z-index: 1000; }
         .menu-toggle { font-size: 1.5rem; cursor: pointer; color: var(--main); padding: 5px; }
 
-        /* --- BOOKS GRID --- */
+        /* --- GRID & CARDS --- */
         .container { padding: 15px; }
         .books-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px; }
         @media (min-width: 600px) { .books-grid { grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 20px; } }
@@ -44,25 +51,19 @@
         .book-card img { width: 100%; height: 160px; object-fit: contain; border-radius: 8px; margin-bottom: 10px; background: #f9f9f9; cursor: pointer; }
         .book-title { font-size: 0.95rem; font-weight: bold; height: 2.4em; overflow: hidden; margin-bottom: 5px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
 
-        /* --- MODAL SYSTEM --- */
+        /* --- MODAL SYSTEM (PDF & INFO) --- */
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 5000; overflow-y: auto; padding: 10px; box-sizing: border-box; backdrop-filter: blur(5px); }
         .modal-content { background: white; width: 100%; max-width: 850px; margin: 20px auto; border-radius: 15px; padding: 20px; position: relative; box-sizing: border-box; animation: slideUp 0.3s ease; }
-        @keyframes slideUp { from { transform: translateY(30px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-        .close-modal { position: absolute; top: 10px; right: 15px; font-size: 32px; cursor: pointer; color: #333; z-index: 10; font-weight: bold; }
+        @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        .close-modal { position: absolute; top: 10px; right: 15px; font-size: 30px; cursor: pointer; color: #999; z-index: 10; }
 
-        .m-stats-box { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; background: #f9f9f9; padding: 12px; border-radius: 10px; font-size: 0.8rem; border: 1px solid #eee; margin-top: 10px; }
+        .m-stats-box { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; background: #f9f9f9; padding: 12px; border-radius: 10px; font-size: 0.8rem; border: 1px solid #eee; margin-top: 10px; }
         .m-pdf-view { width: 100%; height: 450px; border: 1px solid #ddd; border-radius: 10px; margin-top: 10px; background: #eee; }
 
-        /* --- IMPROVED LIGHTBOX (CLOSE BUTTON FIX) --- */
+        /* --- LIGHTBOX (SAME PAGE IMAGE VIEW) --- */
         #lightbox { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.98); z-index: 9999; justify-content: center; align-items: center; cursor: pointer; }
-        #lightbox img { max-width: 95%; max-height: 85vh; object-fit: contain; border-radius: 5px; box-shadow: 0 0 20px rgba(0,0,0,0.5); }
-        
-        .lb-close { 
-            position: absolute; top: 30px; right: 25px; color: white; background: var(--main); 
-            width: 45px; height: 45px; border-radius: 50%; display: flex; align-items: center; 
-            justify-content: center; font-size: 24px; border: 2px solid white; box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-            transition: 0.2s;
-        }
+        #lightbox img { max-width: 95%; max-height: 85vh; object-fit: contain; border-radius: 5px; }
+        .lb-close { position: absolute; top: 30px; right: 25px; color: white; background: var(--main); width: 45px; height: 45px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; border: 2px solid white; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
 
         /* --- BUTTONS --- */
         .btn-group { display: flex; gap: 5px; }
@@ -195,7 +196,7 @@
                 document.getElementById('modalBody').innerHTML = `
                     <div style="display:grid; grid-template-columns: 1fr; gap:15px;">
                         <div style="display:flex; gap:15px; flex-wrap: wrap; align-items:center;">
-                            <img src="${coverUrl}" style="width:110px; border-radius:8px; box-shadow:0 4px 10px rgba(0,0,0,0.1);" onclick="openFull('${coverUrl}')">
+                            <img src="${coverUrl}" style="width:100px; border-radius:8px; box-shadow:0 4px 10px rgba(0,0,0,0.1);" onclick="openFull('${coverUrl}')">
                             <div style="flex:1; min-width:200px;">
                                 <h3 style="margin:0; color:var(--main);">${b.title}</h3>
                                 <p style="margin:5px 0; font-size:0.9rem;"><b>Author:</b> ${b.author}</p>
@@ -203,10 +204,10 @@
                                 
                                 <div class="m-stats-box">
                                     <span><b>Price:</b> ${b.price ? '৳'+b.price : 'Free'}</span>
-                                    <span><b>Category:</b> ${b.category || 'General'}</span>
+                                    <span><b>Cat:</b> ${b.category || 'General'}</span>
                                     <span><b>ISBN:</b> ${b.isbn || 'N/A'}</span>
                                     <span><b>Pages:</b> ${b.pages || 'N/A'}</span>
-                                    <span><b>Language:</b> ${b.language || 'Bengali'}</span>
+                                    <span><b>Lang:</b> ${b.language || 'Bengali'}</span>
                                     <span><b>Date:</b> ${b.pubDate || 'N/A'}</span>
                                     <div style="grid-column: span 2; border-top:1px solid #ddd; padding-top:5px; margin-top:5px;">
                                         <b>Publisher:</b> ${b.publisher || 'N/A'}
@@ -221,7 +222,7 @@
                                 <iframe src="${pdfPreview}" class="m-pdf-view" allow="autoplay"></iframe>
                             ` : `
                                 <div style="padding:40px; background:#f8f8f8; color:#999; border-radius:10px; text-align:center; border:1px dashed #ccc;">
-                                    <i class="fas fa-ghost"></i> No PDF file linked.
+                                    <i class="fas fa-ghost"></i> No PDF linked.
                                 </div>
                             `}
                         </div>
