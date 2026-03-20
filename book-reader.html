@@ -17,16 +17,19 @@
 
         .container { max-width: 1000px; margin: 30px auto; padding: 0 15px; }
 
-        /* Hero Card (Matches your screenshot) */
+        /* Hero Card */
         .book-hero { display: flex; gap: 30px; background: var(--card); padding: 30px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); margin-bottom: 30px; border: 1px solid #eee; }
         .cover-wrapper { flex-shrink: 0; }
-        .main-cover { width: 200px; height: 280px; border-radius: 12px; object-fit: cover; box-shadow: 0 10px 25px rgba(0,0,0,0.1); border: 1px solid #ddd; }
+        /* ADDED: cursor pointer for cover */
+        .main-cover { width: 200px; height: 280px; border-radius: 12px; object-fit: cover; box-shadow: 0 10px 25px rgba(0,0,0,0.1); border: 1px solid #ddd; cursor: pointer; transition: 0.3s; }
+        .main-cover:hover { transform: scale(1.02); }
         
         .book-details { flex: 1; }
         .book-details h1 { margin: 0; font-size: 2.2rem; color: #1a1a1a; }
-        .author-tag { color: var(--main); font-size: 1.2rem; margin: 5px 0 20px; font-weight: 600; }
+        .author-tag { color: var(--main); font-size: 1.2rem; margin: 5px 0 2px; font-weight: 600; }
+        /* ADDED: Editor Style */
+        .editor-tag { color: #666; font-size: 1rem; margin-bottom: 20px; font-style: italic; }
         
-        /* Stats Grid (The 4-6 boxes in your screenshot) */
         .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 15px; }
         .stat-box { background: #fdfdfd; border: 1px solid #eee; padding: 15px; border-radius: 12px; text-align: center; box-shadow: 0 2px 5px rgba(0,0,0,0.02); }
         .stat-box small { display: block; color: #888; text-transform: uppercase; font-size: 0.7rem; letter-spacing: 1px; margin-bottom: 5px; }
@@ -46,9 +49,9 @@
         .gallery-item { width: 100%; height: 250px; border-radius: 12px; object-fit: cover; cursor: pointer; border: 1px solid #ddd; transition: 0.3s; background: white; }
         .gallery-item:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
 
-        /* Lightbox for Gallery */
+        /* Lightbox */
         #lightbox { display: none; position: fixed; z-index: 5000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); backdrop-filter: blur(8px); justify-content: center; align-items: center; flex-direction: column; }
-        #lightbox img { max-width: 90%; max-height: 80vh; border-radius: 10px; }
+        #lightbox img { max-width: 90%; max-height: 80vh; border-radius: 10px; box-shadow: 0 0 30px rgba(0,0,0,0.5); }
         .close-lb { position: absolute; top: 25px; right: 25px; color: white; font-size: 40px; cursor: pointer; background: var(--main); width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 2px solid white; }
 
         @media (max-width: 750px) {
@@ -61,7 +64,7 @@
 <body>
 
 <div id="lightbox" onclick="if(event.target == this) closeLightbox()">
-    <span class="close-lb" onclick="closeLightbox()">&times;</span>
+    <span class="close-lb" onclick="closeLightbox()">×</span>
     <img id="lbImg">
     <div style="color:white; margin-top:20px; font-weight:bold;">FULL PREVIEW</div>
 </div>
@@ -79,6 +82,7 @@
         <div class="book-details">
             <h1 id="title">Loading...</h1>
             <div class="author-tag" id="author"></div>
+            <div class="editor-tag" id="editor" style="display:none;"></div>
             
             <div class="stats-grid">
                 <div class="stat-box"><small>ISBN</small><span id="isbn">N/A</span></div>
@@ -131,7 +135,6 @@
         return id.toString().replace(/[{}]/g, '').trim();
     }
 
-    // Lightbox Logic
     window.openLightbox = (url) => {
         document.getElementById('lbImg').src = url;
         document.getElementById('lightbox').style.display = "flex";
@@ -149,9 +152,16 @@
                 document.getElementById('navTitle').innerText = b.title;
                 document.getElementById('title').innerText = b.title;
                 document.getElementById('author').innerText = "By " + (b.author || "Unknown");
+                
+                // FIXED: Handle Editor
+                if (b.editor) {
+                    const ed = document.getElementById('editor');
+                    ed.innerText = "Editor: " + b.editor;
+                    ed.style.display = 'block';
+                }
+
                 document.getElementById('description').innerText = b.description || "The publisher has provided no summary.";
                 
-                // Meta Info
                 document.getElementById('isbn').innerText = b.isbn || "N/A";
                 document.getElementById('price').innerText = b.price ? "৳" + b.price : "Free";
                 document.getElementById('date').innerText = b.pubDate || "N/A";
@@ -161,9 +171,13 @@
                 document.getElementById('publisher').innerText = b.publisher || "N/A";
                 
                 const coverId = cleanId(b.coverUrl);
-                document.getElementById('mainCover').src = `https://lh3.googleusercontent.com/d/${coverId}`;
+                const fullCoverUrl = `https://lh3.googleusercontent.com/d/${coverId}`;
+                
+                // FIXED: Set cover source and make it clickable for full screen
+                const mainCov = document.getElementById('mainCover');
+                mainCov.src = fullCoverUrl;
+                mainCov.onclick = () => openLightbox(fullCoverUrl);
 
-                // Handle PDF and Download
                 if (b.pdfUrl) {
                     document.getElementById('pdfSection').style.display = 'block';
                     document.getElementById('pdfIframe').src = b.pdfUrl;
@@ -171,16 +185,16 @@
                     document.getElementById('dlBtn').href = `https://drive.google.com/uc?export=download&id=${pid}`;
                 }
 
-                // Handle Gallery
                 if (b.gallery && Array.isArray(b.gallery) && b.gallery.length > 0) {
                     document.getElementById('galSection').style.display = 'block';
                     const grid = document.getElementById('galGrid');
                     b.gallery.forEach(url => {
                         const id = cleanId(url);
+                        const galleryImgUrl = `https://lh3.googleusercontent.com/d/${id}`;
                         const img = document.createElement('img');
-                        img.src = `https://lh3.googleusercontent.com/d/${id}`;
+                        img.src = galleryImgUrl;
                         img.className = 'gallery-item';
-                        img.onclick = () => openLightbox(`https://lh3.googleusercontent.com/d/${id}`);
+                        img.onclick = () => openLightbox(galleryImgUrl);
                         grid.appendChild(img);
                     });
                 }
