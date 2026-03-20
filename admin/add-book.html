@@ -34,10 +34,16 @@
 </header>
 <div class="container">
     <div class="form-card">
-        <div class="grid">
-            <div><label>Book Title *</label><input type="text" id="title" required></div>
-            <div><label>Author *</label><input type="text" id="author" required></div>
+        <div class="form-group" style="margin-bottom:15px;">
+            <label>Book Title *</label>
+            <input type="text" id="title" required>
         </div>
+
+        <div class="grid">
+            <div><label>Author *</label><input type="text" id="author" required></div>
+            <div><label>Editor</label><input type="text" id="editor" placeholder="Optional"></div>
+        </div>
+
         <div class="grid">
             <div><label>Category</label><select id="cat"><option>General</option><option>Poetry</option><option>Novel</option><option>Essay</option></select></div>
             <div><label>Language</label><input type="text" id="lang" value="Bengali"></div>
@@ -74,12 +80,28 @@
         <button id="saveBtn">Upload and Add Book</button>
     </div>
 </div>
+
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getDatabase, ref, push, set } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
-    const fb = initializeApp({ apiKey: "AIzaSyCftWFc6WvMbaY_iwF6DUawi7Qvf0SRKYc", databaseURL: "https://sahitya-mela-default-rtdb.firebaseio.com", projectId: "sahitya-mela" });
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+
+    const firebaseConfig = { 
+        apiKey: "AIzaSyCftWFc6WvMbaY_iwF6DUawi7Qvf0SRKYc", 
+        authDomain: "sahitya-mela.firebaseapp.com",
+        databaseURL: "https://sahitya-mela-default-rtdb.firebaseio.com", 
+        projectId: "sahitya-mela",
+        appId: "1:283544938564:web:b9bba32cca9e52e6aab411"
+    };
+
+    const fb = initializeApp(firebaseConfig);
     const db = getDatabase(fb);
+    const auth = getAuth(fb);
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzdDsLPr7F-6gwkKzdJLNgCUZPIWIryVdKqrdnrtDX4DOK7hkLlhnXxcBjvEMH69d3r/exec";
+
+    onAuthStateChanged(auth, (user) => {
+        if (!user) window.location.href = "login.html";
+    });
 
     let galFiles = [];
     window.preC = (i) => { if(i.files[0]) { document.getElementById('pC').src = URL.createObjectURL(i.files[0]); document.getElementById('rC').style.display='flex'; document.getElementById('pT').style.display='none'; }};
@@ -105,22 +127,52 @@
         const title = document.getElementById('title').value;
         const cF = document.getElementById('cIn').files[0];
         if(!title || !cF) return alert("Title and Cover required");
+        if(!auth.currentUser) return alert("Session expired.");
+
         document.getElementById('saveBtn').disabled = true;
         document.getElementById('pB').style.display='block';
         const bar = document.getElementById('pBar');
+
         try {
             bar.style.width="20%"; bar.innerText="Cover...";
             const cid = await upload(cF);
-            let book = { title, author: document.getElementById('author').value, category: document.getElementById('cat').value, language: document.getElementById('lang').value, pubDate: document.getElementById('pubDate').value, isbn: document.getElementById('isbn').value, pages: document.getElementById('pages').value, price: document.getElementById('price').value, publisher: document.getElementById('pub').value, description: document.getElementById('desc').value, coverUrl: cid, gallery: [] };
+            
+            // UPDATED OBJECT: Capturing both Author and Editor
+            let book = { 
+                title, 
+                author: document.getElementById('author').value, 
+                editor: document.getElementById('editor').value, 
+                category: document.getElementById('cat').value, 
+                language: document.getElementById('lang').value, 
+                pubDate: document.getElementById('pubDate').value, 
+                isbn: document.getElementById('isbn').value, 
+                pages: document.getElementById('pages').value, 
+                price: document.getElementById('price').value, 
+                publisher: document.getElementById('pub').value, 
+                description: document.getElementById('desc').value, 
+                coverUrl: cid, 
+                gallery: [] 
+            };
+
             const pF = document.getElementById('pIn').files[0];
-            if(pF) { bar.style.width="50%"; bar.innerText="PDF..."; book.pdfUrl = "https://drive.google.com/file/d/"+(await upload(pF))+"/preview"; }
+            if(pF) { 
+                bar.style.width="50%"; bar.innerText="PDF..."; 
+                book.pdfUrl = "https://drive.google.com/file/d/"+(await upload(pF))+"/preview"; 
+            }
+
             for(let i=0; i<galFiles.length; i++) {
                 bar.style.width = (60+i) + "%"; bar.innerText = "Photo "+(i+1);
                 book.gallery.push(await upload(galFiles[i]));
             }
+
             await set(push(ref(db, 'books')), book);
-            alert("✅ Added Successfully!"); location.reload();
-        } catch(e) { alert("Error! Check script and rules."); document.getElementById('saveBtn').disabled = false; }
+            alert("✅ Added Successfully!"); 
+            location.reload();
+        } catch(e) { 
+            console.error(e);
+            alert("Error! Check script and rules."); 
+            document.getElementById('saveBtn').disabled = false; 
+        }
     };
 </script>
 </body>
