@@ -38,9 +38,11 @@
         .glass-clock { background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.2); padding: 15px 30px; border-radius: 50px; display: inline-block; margin-bottom: 30px; }
         #heroTime { font-size: 1.8rem; font-weight: bold; color: #f1c40f; }
         #heroDate { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 2px; }
+        #bengaliDate { font-family: 'Noto Serif Bengali', serif; font-size: 1.1rem; color: #f1c40f; margin-top: 5px; }
+
         .reveal-text { font-size: 4rem; font-family: 'Playfair Display', serif; margin: 0; opacity: 0; transform: translateY(30px); animation: fadeInUp 1s forwards ease-out; }
         
-        /* YELLOW HIGHLIGHT */
+        /* THIS IS THE YELLOW HIGHLIGHT YOU ASKED FOR */
         .highlight { color: #f1c40f; }
         
         @keyframes fadeInUp { to { opacity: 1; transform: translateY(0); } }
@@ -134,6 +136,7 @@
             <div class="glass-clock">
                 <div id="heroDate">...</div>
                 <div id="heroTime">...</div>
+                <div id="bengaliDate">...</div>
             </div>
             <h1 class="reveal-text">Welcome to <span class="highlight">SAHITYA MELA</span></h1>
             <p style="font-size: 1.4rem; color: #f1c40f; margin-bottom: 5px;">50 Years of Literary Tradition</p>
@@ -214,32 +217,59 @@
 
         document.getElementById('menuToggle').onclick = () => document.getElementById('navMenu').classList.toggle('active');
 
-        // NEWSLETTER LOGIC
+        // BENGALI DATE CALCULATION
+        function getBengaliDate(date) {
+            const bMonths = ["বৈশাখ", "জ্যৈষ্ঠ", "আষাঢ়", "শ্রাবণ", "ভাদ্র", "আশ্বিন", "কার্তিক", "অগ্রহায়ণ", "পৌষ", "মাঘ", "ফাল্গুন", "চৈত্র"];
+            const bNumbers = ["০", "১", "২", "৩", "৪", "৫", "৬", "৭", "৮", "৯"];
+            
+            let day = date.getDate();
+            let month = date.getMonth();
+            let year = date.getFullYear();
+            
+            let bYear = year - 593;
+            let bDay, bMonthName;
+            
+            if (month < 3 || (month === 3 && day < 14)) bYear -= 1;
+            
+            const bengaliMonthMap = [
+                { m: 0, d: 13, name: 8 }, { m: 1, d: 12, name: 9 }, { m: 2, d: 14, name: 10 },
+                { m: 3, d: 14, name: 11 }, { m: 4, d: 14, name: 0 }, { m: 5, d: 15, name: 1 },
+                { m: 6, d: 16, name: 2 }, { m: 7, d: 16, name: 3 }, { m: 8, d: 16, name: 4 },
+                { m: 9, d: 16, name: 5 }, { m: 10, d: 15, name: 6 }, { m: 11, d: 15, name: 7 }
+            ];
+
+            const currentMap = bengaliMonthMap[month];
+            if (day <= currentMap.d) {
+                bMonthName = bMonths[currentMap.name];
+                bDay = day + (30 - currentMap.d); 
+            } else {
+                bMonthName = bMonths[(currentMap.name + 1) % 12];
+                bDay = day - currentMap.d;
+            }
+
+            const toBengaliNum = (num) => num.toString().split('').map(d => bNumbers[d]).join('');
+            return `${toBengaliNum(bDay)} ${bMonthName}, ${toBengaliNum(bYear)}`;
+        }
+
+        function updateClock() {
+            const now = new Date();
+            document.getElementById('heroDate').innerText = now.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+            document.getElementById('heroTime').innerText = now.toLocaleTimeString('en-US', { hour12: true });
+            document.getElementById('bengaliDate').innerText = getBengaliDate(now);
+        }
+        setInterval(updateClock, 1000);
+        updateClock();
+
+        // NEWSLETTER
         const newsletterForm = document.getElementById('newsletterForm');
         newsletterForm.onsubmit = (e) => {
             e.preventDefault();
             const email = document.getElementById('subscriberEmail').value;
             const msg = document.getElementById('newsletterMsg');
-            const btn = newsletterForm.querySelector('button');
-
-            btn.disabled = true;
-            btn.innerText = "Joining...";
-
-            push(ref(db, 'subscribers'), {
-                email: email,
-                date: new Date().toISOString()
-            }).then(() => {
-                msg.innerText = "Thank you for subscribing!";
-                msg.style.color = "green";
-                msg.style.display = "block";
+            push(ref(db, 'subscribers'), { email: email, date: new Date().toISOString() }).then(() => {
+                msg.innerText = "Subscribed successfully!";
+                msg.style.color = "green"; msg.style.display = "block";
                 newsletterForm.reset();
-            }).catch((err) => {
-                msg.innerText = "Error. Please try again.";
-                msg.style.color = "red";
-                msg.style.display = "block";
-            }).finally(() => {
-                btn.disabled = false;
-                btn.innerText = "Subscribe";
             });
         };
 
@@ -255,22 +285,6 @@
             } catch (e) { return "assets/images/logo.png"; }
         }
 
-        function updateClock() {
-            const now = new Date();
-            document.getElementById('heroDate').innerText = now.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
-            document.getElementById('heroTime').innerText = now.toLocaleTimeString('en-US', { hour12: true });
-        }
-        setInterval(updateClock, 1000); updateClock();
-
-        window.onscroll = function() {
-            const btn = document.getElementById("backToTop");
-            if (document.body.scrollTop > 400 || document.documentElement.scrollTop > 400) {
-                btn.classList.add("show");
-            } else {
-                btn.classList.remove("show");
-            }
-        };
-
         const latestQuery = query(ref(db, 'books'), limitToLast(10));
         onValue(latestQuery, (snapshot) => {
             const grid = document.getElementById('featuredBooks');
@@ -283,7 +297,6 @@
                     if (book.gallery && Array.isArray(book.gallery)) {
                         book.gallery.forEach(g => { if(g) imgs.push(fixUrl(g)); });
                     }
-
                     const card = document.createElement('div');
                     card.className = 'book-card';
                     card.onclick = () => location.href = `book-reader.html?id=${bookId}`;
@@ -292,7 +305,7 @@
                             ${imgs.map((src, i) => `<img src="${src}" class="slide-img ${i === 0 ? 'active' : ''}" onerror="this.src='assets/images/logo.png'">`).join('')}
                         </div>
                         <div class="book-details">
-                            <h3 style="margin:0; font-size:1.1rem; color:#222;">${book.title || 'Untitled'}</h3>
+                            <h3 style="margin:0; font-size:1.1rem;">${book.title || 'Untitled'}</h3>
                             <p style="margin:5px 0; color:#666; font-size:0.85rem;">By ${book.author || 'Unknown'}</p>
                             <span class="read-btn">Read Now</span>
                         </div>
@@ -313,7 +326,7 @@
                 slides[current].classList.remove('active');
                 current = (current + 1) % slides.length;
                 slides[current].classList.add('active');
-            }, 5000); // 5 Seconds Speed
+            }, 5000); 
         }
     </script>
 </body>
