@@ -3,7 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
-    <title>SAHITYA MELA - 50 Years of Literary Tradition</title>
+    
+    <meta name="google-site-verification" content="google88836e43ae0f943d" />
+    <title>Sahitya Mela | 50 Years of Literary Tradition</title>
+    <meta name="description" content="Sahitya Mela is a digital library celebrating 50 years of literature. Explore our collection of Bengali poetry, stories, and books.">
+    <meta name="keywords" content="Sahitya Mela, সাহিত্য মেলা, Bengali Literature, Poetry, Stories, Library">
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+Bengali:wght@300;400;700&family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet">
@@ -319,7 +323,6 @@
                         card.className = 'book-card';
                         card.onclick = () => { window.location.href = `book-reader.html?id=${bookId}`; };
                         
-                        // FIXED: Re-added the unique coverUrl inside the loop
                         card.innerHTML = `
                             <div class="book-cover-box">
                                 <img src="${fixUrl(book.coverUrl)}" onerror="this.src='assets/images/logo.png'">
