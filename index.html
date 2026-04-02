@@ -42,7 +42,6 @@
 
         .reveal-text { font-size: 4rem; font-family: 'Playfair Display', serif; margin: 0; opacity: 0; transform: translateY(30px); animation: fadeInUp 1s forwards ease-out; }
         
-        /* THIS IS THE YELLOW HIGHLIGHT YOU ASKED FOR */
         .highlight { color: #f1c40f; }
         
         @keyframes fadeInUp { to { opacity: 1; transform: translateY(0); } }
@@ -204,7 +203,8 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getDatabase, ref, onValue, query, limitToLast, push } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+        // ADDED update and increment to imports
+        import { getDatabase, ref, onValue, query, limitToLast, push, update, increment } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyCftWFc6WvMbaY_iwF6DUawi7Qvf0SRKYc",
@@ -215,11 +215,16 @@
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
 
+        // --- TRACK TOTAL VISITS (NEW CODE) ---
+        update(ref(db, 'stats'), {
+            totalViews: increment(1)
+        }).catch(err => console.error("Stats Error:", err));
+
         document.getElementById('menuToggle').onclick = () => document.getElementById('navMenu').classList.toggle('active');
 
         // BENGALI DATE CALCULATION
         function getBengaliDate(date) {
-            const bMonths = ["বৈশাখ", "জ্যৈষ্ঠ", "আষাঢ়", "শ্রাবণ", "ভাদ্র", "আশ্বিন", "কার্তিক", "অগ্রহায়ণ", "পৌষ", "মাঘ", "ফাল্গুন", "চৈত্র"];
+            const bMonths = ["বৈশাখ", "জ্যৈষ্ঠ", "আষাঢ়", "শ্রাবণ", "ভাদ্র", "আশ্বিন", "কার্তিক", "অগ্রহায়ণ", "পৌষ", "মাঘ", "ফালগুন", "চৈত্র"];
             const bNumbers = ["০", "১", "২", "৩", "৪", "৫", "৬", "৭", "৮", "৯"];
             
             let day = date.getDate();
