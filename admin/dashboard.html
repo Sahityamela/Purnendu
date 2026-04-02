@@ -48,6 +48,12 @@
         .mobile-backdrop.active { display: block; }
 
         .logout-btn { background: var(--main); color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-weight: bold; }
+
+        /* Analytics Table Styles */
+        .stats-table { width: 100%; border-collapse: collapse; background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-top: 30px; }
+        .stats-table th { background: var(--main); color: white; padding: 15px; text-align: left; font-size: 0.9rem; }
+        .stats-table td { padding: 15px; border-bottom: 1px solid #eee; font-size: 0.9rem; }
+        .stats-table tr:hover { background: #fffcfc; }
     </style>
 </head>
 <body>
@@ -92,21 +98,19 @@
 
             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 25px;">
                 
-                <a href="add-book.html" style="text-decoration: none;">
-                    <div class="dashboard-card">
-                        <i class="fas fa-plus-circle"></i>
-                        <h3 style="color: #333;">Add New Book</h3>
-                        <p style="color: #777; font-size: 14px;">Upload new literary works to the cloud.</p>
-                    </div>
-                </a>
+                <div class="dashboard-card">
+                    <i class="fas fa-chart-line" style="color: #2ecc71;"></i>
+                    <h3 style="color: #333; margin-bottom: 5px;">Website Visits</h3>
+                    <div id="totalVisitsCount" style="font-size: 2.5rem; font-weight: bold; color: #2ecc71;">--</div>
+                    <p style="color: #777; font-size: 14px;">Total audience reach so far.</p>
+                </div>
 
-                <a href="manage-books.html" style="text-decoration: none;">
-                    <div class="dashboard-card">
-                        <i class="fas fa-edit"></i>
-                        <h3 style="color: #333;">Edit/Delete</h3>
-                        <p style="color: #777; font-size: 14px;">Update details or remove books.</p>
-                    </div>
-                </a>
+                <div class="dashboard-card">
+                    <i class="fas fa-crown" style="color: #f1c40f;"></i>
+                    <h3 style="color: #333; margin-bottom: 5px;">Most Read Book</h3>
+                    <div id="topBookName" style="font-size: 1rem; font-weight: bold; color: #333; margin-top: 10px;">Loading...</div>
+                    <p id="topBookViews" style="color: #f1c40f; font-weight: bold; margin-top: 5px;">--</p>
+                </div>
 
                 <a href="manage-books.html" style="text-decoration: none;">
                     <div class="dashboard-card">
@@ -121,20 +125,29 @@
                     <div class="dashboard-card">
                         <i class="fas fa-users"></i>
                         <h3 style="color: #333; margin-bottom: 5px;">Subscribers</h3>
-                        <div id="totalSubCount" style="font-size: 2.5rem; font-weight: bold; color: #f1c40f;">--</div>
+                        <div id="totalSubCount" style="font-size: 2.5rem; font-weight: bold; color: #3498db;">--</div>
                         <p style="color: #777; font-size: 14px;">Readers joined your newsletter.</p>
                     </div>
                 </a>
 
-                <a href="messages.html" style="text-decoration: none;">
-                    <div class="dashboard-card">
-                        <i class="fas fa-envelope-open-text"></i>
-                        <h3 style="color: #333;">Reader Inbox</h3>
-                        <p style="color: #777; font-size: 14px;">View and respond to contact messages.</p>
-                    </div>
-                </a>
-
             </div>
+
+            <div style="margin-top: 50px;">
+                <h2 style="color: var(--main); font-family: 'Playfair Display', serif;"><i class="fas fa-list-ol"></i> Book Performance</h2>
+                <table class="stats-table">
+                    <thead>
+                        <tr>
+                            <th>Book Title</th>
+                            <th>Author</th>
+                            <th>Total Reads</th>
+                        </tr>
+                    </thead>
+                    <tbody id="statsTableBody">
+                        <tr><td colspan="3" style="text-align:center;">Loading performance data...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
         </main>
     </div>
 
@@ -164,9 +177,49 @@
             }
         });
 
-        // 📊 BOOK COUNTER
+        // 📈 TOTAL WEBSITE VISITS COUNTER
+        onValue(ref(db, 'stats/totalViews'), (snap) => {
+            document.getElementById('totalVisitsCount').innerText = snap.val() || "0";
+        });
+
+        // 📊 BOOK ANALYTICS & TOTAL COUNTER
         onValue(ref(db, 'books'), (snap) => {
-            document.getElementById('totalBookCount').innerText = snap.exists() ? Object.keys(snap.val()).length : "0";
+            if (snap.exists()) {
+                const data = snap.val();
+                const bookIds = Object.keys(data);
+                document.getElementById('totalBookCount').innerText = bookIds.length;
+
+                // Create array for sorting
+                let booksArray = [];
+                bookIds.forEach(id => {
+                    booksArray.push({ id, ...data[id] });
+                });
+
+                // Sort by views (Highest first)
+                booksArray.sort((a, b) => (b.views || 0) - (a.views || 0));
+
+                // Update "Most Popular Book" Card
+                if(booksArray.length > 0) {
+                    document.getElementById('topBookName').innerText = booksArray[0].title;
+                    document.getElementById('topBookViews').innerText = (booksArray[0].views || 0) + " READS";
+                }
+
+                // Update Performance Table
+                const tbody = document.getElementById('statsTableBody');
+                tbody.innerHTML = '';
+                booksArray.forEach(book => {
+                    tbody.innerHTML += `
+                        <tr>
+                            <td><b>${book.title}</b></td>
+                            <td>${book.author || 'N/A'}</td>
+                            <td style="color: var(--main); font-weight: bold;">${book.views || 0}</td>
+                        </tr>
+                    `;
+                });
+            } else {
+                document.getElementById('totalBookCount').innerText = "0";
+                document.getElementById('statsTableBody').innerHTML = '<tr><td colspan="3" style="text-align:center;">No books found.</td></tr>';
+            }
         });
 
         // 📧 SUBSCRIBER COUNTER
