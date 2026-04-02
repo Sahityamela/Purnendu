@@ -20,14 +20,12 @@
         /* Hero Card */
         .book-hero { display: flex; gap: 30px; background: var(--card); padding: 30px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); margin-bottom: 30px; border: 1px solid #eee; }
         .cover-wrapper { flex-shrink: 0; }
-        /* ADDED: cursor pointer for cover */
         .main-cover { width: 200px; height: 280px; border-radius: 12px; object-fit: cover; box-shadow: 0 10px 25px rgba(0,0,0,0.1); border: 1px solid #ddd; cursor: pointer; transition: 0.3s; }
         .main-cover:hover { transform: scale(1.02); }
         
         .book-details { flex: 1; }
         .book-details h1 { margin: 0; font-size: 2.2rem; color: #1a1a1a; }
         .author-tag { color: var(--main); font-size: 1.2rem; margin: 5px 0 2px; font-weight: 600; }
-        /* ADDED: Editor Style */
         .editor-tag { color: #666; font-size: 1rem; margin-bottom: 20px; font-style: italic; }
         
         .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 15px; }
@@ -119,7 +117,8 @@
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+    // ADDED update and increment here
+    import { getDatabase, ref, get, update, increment } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
     const fb = initializeApp({ 
         apiKey: "AIzaSyCftWFc6WvMbaY_iwF6DUawi7Qvf0SRKYc", 
@@ -149,11 +148,16 @@
         get(ref(db, 'books/' + bookId)).then((s) => {
             if (s.exists()) {
                 const b = s.val();
+
+                // --- TRACK BOOK VIEWS (NEW CODE) ---
+                update(ref(db, 'books/' + bookId), {
+                    views: increment(1)
+                }).catch(err => console.error("Book View Error:", err));
+
                 document.getElementById('navTitle').innerText = b.title;
                 document.getElementById('title').innerText = b.title;
                 document.getElementById('author').innerText = "By " + (b.author || "Unknown");
                 
-                // FIXED: Handle Editor
                 if (b.editor) {
                     const ed = document.getElementById('editor');
                     ed.innerText = "Editor: " + b.editor;
@@ -173,7 +177,6 @@
                 const coverId = cleanId(b.coverUrl);
                 const fullCoverUrl = `https://lh3.googleusercontent.com/d/${coverId}`;
                 
-                // FIXED: Set cover source and make it clickable for full screen
                 const mainCov = document.getElementById('mainCover');
                 mainCov.src = fullCoverUrl;
                 mainCov.onclick = () => openLightbox(fullCoverUrl);
